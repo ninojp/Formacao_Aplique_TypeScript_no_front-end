@@ -2,6 +2,7 @@
 
 let saldo:number = 3000;
 
+//-------------------------------------------------------------------------------------------------
 const elementoSaldo = document.querySelector('.saldo-valor .valor') as HTMLInputElement;
 if (elementoSaldo) {
     elementoSaldo.textContent = saldo.toString();

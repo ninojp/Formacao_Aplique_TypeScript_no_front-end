@@ -609,7 +609,588 @@ Porém, existem muito mais recursos do TypeScript disponíveis para termos uma e
 
 ## Aula 2 - Definindo Tipos
 
-### Aula 2 -  - Vídeo 1
-### Aula 2 -  - Vídeo 2
-### Aula 2 -  - Vídeo 3
-### Aula 2 -  - Vídeo 4
+### Aula 2 - Reorganização dos arquivos - Vídeo 1
+
+Transcrição  
+Antes de nos aprofundarmos no TypeScript, vamos reorganizar a estrutura de pastas e arquivos do nosso projeto, assim, obteremos uma organização mais próxima da realidade, isto é, do que encontraremos no cotidiano de trabalho com projetos envolvendo TypeScript.
+
+Temos uma pasta de projeto única, o byteban.ts com as pastas de CSS, imagens e scripts, onde está tanto o JavaScript compilado, quanto o arquivo de TypeScript, o indexHTML e os itens de requisito.
+
+Porém, quando vamos trabalhar em um projeto real, a nossa organização é feita da seguinte maneira:
+
+Uma pasta destinada à produção, ou seja, ao ambiente de produção, onde a aplicação será realmente rodada, o que vai realmente para o servidor para ser hospedado — no caso de projetos web;
+
+Uma pasta de desenvolvimento, com arquivos que só interessam no momento de desenvolvimento do código, isto é, da escrita do código.
+
+Por exemplo, o TypeScript não usa diretamente o browser. Quando criamos o nosso projeto, tivemos que compilar o código do TypeScript em JavaScript para, então, ele ser executado no navegador. O motivo é que o navegador não entende o TypeScript.
+
+Esse arquivo só interessa a nós, pessoas desenvolvedoras, no momento de codificação. Ele é um arquivo que pertence ao ambiente de desenvolvimento apenas. No ambiente de produção, o que importa é o JavaScript gerado.
+
+Então, vamos reorganizar a nossa estrutura de parsers e arquivos para que ela remeta à estrutura comumente utilizada no âmbito profissional.
+
+No bytebank.ts, vamos criar uma pasta chamada dist e outra pasta chamada src, sendo que "dist" vem do inglês "distribution" (distribuição). É um nome comum em projetos web, bastante utilizado para nomear a pasta que representa o conjunto de arquivos que vai para o ambiente final.
+
+Mas, o que vai para o ambiente final? O css, que já está pronto. Portanto, podemos movê-lo para a pasta dist. A pasta de images também vai para a pasta dist. Por fim, também moveremos o index.html. Essa estrutura de arquivos é o que de fato vai para o ambiente final.
+
+Na pasta js, que ainda está fora da dist, temos somente o JavaScript que foi gerado pela nossa aplicação. É ele quem vai para o ambiente final, então, vamos mover a pasta js para dist.
+
+Mas, o que nos interessa é que a pasta JavaScript, isto é, a pasta js, tenha apenas arquivos JavaScript. No momento, ela também contém o arquivo de TypeScript, typescript.ts, o que não é necessário. Reiterando, o ts só interessa ao ambiente de desenvolvimento, quando a aplicação é codificada.
+
+O arquivo typescript.ts será movido para a pasta src, sendo que "src" vem do inglês "source" (fonte ou código fonte). O nome "src" é bastante comum para pastas de desenvolvimento de projetos.
+
+Em vários frameworks como o React, existe uma pasta "src", onde ficam os códigos que realmente serão codificados. Essa pasta é de distribuição, onde estão os arquivos que são encaminhados para o ambiente final.
+
+Então, fizemos a reorganização:
+
+Na pasta src, ficará tudo que precisamos para realizar o desenvolvimento da nossa aplicação. Como trabalharemos apenas com TypeScript, precisamos só do código TypeScript.
+
+Na pasta js, que está dentro da pasta dist, ficará todo o script gerado pelo TypeScript que criamos, além dos estilos, imagens e o index.html que é a nossa página.
+
+A partir de agora, vamos começar a trabalhar apenas na pasta src, que é onde estará nossa lógica com TypeScript. Também pediremos ao nosso ambiente, o VSCode, que gere todo o código necessário e transporte para a pasta dist que, no caso, é todo o TypeScript compilado em JavaScript.
+
+Para isso, temos que escrever o comando tsc e o nome do arquivo que desejamos compilar. Por exemplo, quando escrevemos tscbytebank.ts, o arquivo é compilado e o arquivo js correspondente é gerado.
+
+Não é muito produtivo fazer isso o tempo inteiro, isto é, escrever o comando a toda hora para realizar a compilação. Além disso, quando ele compila, gera o arquivo no mesmo local em que o arquivo compilado está. Significa que se rodarmos o comando tscsrcbytebank.ts, um bytebank.js será gerado dentro da pasta ts. Nós não queremos isso.
+
+Precisamos dar um passo a mais: temos toda a estrutura organizada e vamos configurar o TypeScript para o nosso projeto de modo que ele não só faça a compilação automática, como também coloque os arquivos compilados no local certo.
+
+Esse é o próximo passo. Vamos lá!!
+
+### Aula 2 - Configuração do tsconfig.json - Vídeo 2
+
+Transcrição  
+Terminamos o vídeo anterior com a seguinte tarefa:
+
+Precisamos dar um passo a mais! Temos toda a estrutura organizada e vamos configurar o TypeScript para o nosso projeto de modo que ele não só faça a compilação automática, como também coloque os arquivos compilados no local certo.
+
+Para realizarmos essa configuração, precisamos criar, na nossa pasta de projetos, um arquivo chamado "tsconfig". Ele fica no root do nosso projeto, isto é, na pasta principal e diz como o controlador do TypeScript deve se comportar na aplicação.
+
+Estamos com o VSCode aberto no Terminal. Na lateral esquerda, fora das pastas dist e src, vamos criar um novo arquivo chamado tsconfig.json. Ele é um arquivo de configuração do TypeScript.
+
+Passaremos, portanto, algumas configurações. Começando por compilerOptions (configurações do compilador) e teremos target com o valor ES2022. O target se refere a qual versão do JavaScript deve ser utilizada para compilar o JavaScript.
+
+Podemos fazer um código TypeScript e pedir que ele seja compilado sempre em uma versão mais antiga, por exemplo, assim, asseguramos que nosso código rodará no IE (Internet Explorer), caso nosso projeto tenha esse tipo de requisito.
+
+No nosso caso, pedimos a compilação pela versão mais recente no momento de gravação do curso, que é a "ES2022".
+
+```JavaScript
+{
+    "compilerOptions": {
+        "target": "ES2022",
+    }
+}
+```
+
+Também podemos definir o "ESNext" como valor, mas não é recomendável, pois ele tenta sempre trazer a versão mais recente do JavaScript e a possibilidade de haver recursos que não estão implementados em todos os navegadores, mesmo os mais recentes, é bastante grande.
+
+Então, é sempre bom escolher uma versão mais segura ou a que estiver definida para o projeto!
+
+Após o target, passaremos o outDir, que é o diretório de outputs, onde devemos colocar todos os arquivos que o TypeScript compilar. No caso, queremos que ele verifique a pasta ./dist e coloque tudo na pasta js/.
+
+```JavaScript
+{
+    "compilerOptions": {
+        "target": "ES2022",
+        "outDir": "./dist/js/",
+      
+    }
+}
+```
+
+Assim, tudo que for compilado no projeto deve ser encaminhado para essa pasta de destino. Após o outDir, passaremos o noEmitOnError: true. Significa que todas as vezes em que um erro for identificado, ele não deve gerar um arquivo .js na pasta de destino.
+
+O arquivo .js correspondente só deve ser gerado uma vez que todos os erros encontrados tenham sido resolvidos. Por padrão, mesmo com erro, um arquivo é criado na pasta de destino.
+
+No nosso caso, queremos garantir que o arquivo só seja gerado na pasta final se não existir erro algum sendo apontado pelo TypeScript. Por isso, usamos o noEmitOnError, ou seja, "não emita a geração do arquivo caso exista algum erro".
+
+```JavaScript
+{
+    "compilerOptions": {
+        "target": "ES2022",
+        "outDir": "./dist/js/",
+        "noEmitOnError": true
+    }
+}
+```
+
+Fora do compilerOptions, adicionaremos uma opção chamada include, que é um array, e passaremos as pastas onde ele deve procurar os arquivos TypeScript. No nosso caso, ele deve procurar todos os arquivos TypeScript para que eles sejam compilados dentro da pasta src, que é nossa pasta de desenvolvimento.
+
+Então, colocaremos todos os arquivos TypeScript na pasta src, obedecendo uma estrutura correta que aprenderemos ao longo do curso, e o include vai sempre olhar todos os arquivos da pasta src, compilá-los e enviá-los para a pasta de destino, dist.js.
+
+```JavaScript
+{
+    "compilerOptions": {
+        "target": "ES2022",
+        "outDir": "./dist/js/",
+        "noEmitOnError": true
+    },
+    "include": [
+        "./src/**/*"
+    ]
+}
+```
+
+Configuramos o tsconfig.json, ou seja, demos as diretrizes de como o TypeScript Compiler deve se comportar no projeto e, agora, faremos um teste! No bytebank.ts, vamos adicionar um código qualquer, por exemplo, um alert("Testando compilação do TS");.
+
+```JavaScript
+let saldo 3000;
+
+alert("Testando compalação do TS-);
+const elementosaldo = document.querySelector(".saldo-valor .valor") as HTMLElement;
+if (elementoSaldo ≠ null) {
+    elementoSaldo.textContent saldo.toString();
+}
+
+const elementoFormulario = document.querySelector(".block-nova-transacao form") as HTML FormElement;
+elementoFormulario.addEventListener("submit", function(event) {
+    event.preventDefault();
+    if (!elementoFormulario.checkvalidity()) {
+         alert("Por favor, preencha todos os campos da transação!");
+return;
+```
+
+Vamos abrir o Terminal. Basta acessar "View > Terminal" ou usar a tecla de atalho correspondente ao seu sistema operacional. Estamos na pasta bytebank.ts. Antes, sempre passávamos tsc seguido do nome do arquivo. Mas, isso dá muito trabalho. Vamos ter que ficar criando vários arquivos ts ao longo do curso. Não dá para ficar compilando um por um.
+
+O TypeScript Compiler tem um recurso chamado watch, um "ouvidor", "acompanhador" ou algo do tipo, que fica monitorando os arquivos .ts e todas as vezes em que eles tiverem alguma alteração, compila automaticamente. Então, escreveremos:
+
+```JavaScript
+tsc -w
+```
+
+Found 0 errors. Watching for file changes.
+
+Com isso, o watch fica monitorando a pasta src, porque verificou o tsconfig.json e encontrou as configurações. Todas as vezes em que algum arquivo .ts for modificado, ele gera um arquivo correspondente .js na pasta de destino.
+
+Vamos abrir o index.html no "Live Server" (Botão direito do mouse e "Open with Live Server"). Aparecerá uma mensagem de aviso "Testando compilação do TS" e podemos apertar "Ok". Ele já identificou a primeira modificação.
+
+Se trocarmos a frase do alert() para Outra frase aqui e retornarmos à página e dermos um refresh (atualizar) aparecerá o mesmo alerta indicando a mudança de frase para "Outra frase aqui".
+
+Então, sempre que há uma alteração nos arquivos .ts, automaticamente o arquivo JavaScript correspondente é gerado, assim, não precisamos ficar escrevendo comandos de compilação o tempo inteiro. Feito o teste, podemos remover o alert().
+
+Agora nosso ambiente está bem mais profissional e podemos começar a focar em escrever a lógica necessária para a aplicação rodar, além de explorar um pouco mais os recursos do TypeScript. Vamos lá?!
+
+### Aula 2 - Tipos primitivos - Vídeo 3
+
+Transcrição  
+Para aproveitarmos o TypeScript ao máximo, vamos conhecer um pouco da estrutura de tipos, como elas trabalham e qual a vantagem em utilizarmos essa estrutura de tipos estáticos que a linguagem nos proporciona.
+
+Na pasta src, que é a nossa pasta de desenvolvimento, vamos criar um segundo arquivo para explorarmos esses recursos do TypeScript. O nosso arquivo vai se chamar typescript.ts.
+
+No index.html da nossa pasta dist, nós importaremos esse arquivo typescript.ts. Teremos uma exploração conceitual do TypeScript.
+
+```JavaScript
+// Código omitido. 
+                       </div>
+                        <time class="data">27/08</time>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </main>
+        <script src="js/bytebank.js"></script>
+        <script src="js/typescript.js"></script>
+</body>
+</html>
+```
+
+Em seguida, abrindo o Terminal, perceberemos o watcher está em ação:
+
+[16:02:23] File change detected. Startimg incremental compilation...
+
+[16:02:23] Found 0 errors. Watching for file changes.
+
+Então, todas as vezes em que criamos e modificamos um arquivo, o arquivo correspondente é gerado na pasta final. Importado o TypeScript, podemos explorar alguns recursos básicos dele.
+
+Na pasta typescript.ts, vamos criar uma variável chamada saldo e atribuir a ela o valor 3000.
+
+```JavaScript
+let saldo = 3000; 
+```
+
+Quando escrevemos isso, o TypeScript nos avisa que há um problema.
+
+Aparentemente, não há nada de errado em atribuir o valor 3000 a uma variável chamada saldo no arquivo novo, mas, o TypeScript já percebeu que há dois arquivos .ts no projeto e o index.html importa os dois: `<script src="js/bytebank.js"></script> e <script src="js/typescript.js"></script>`.
+
+Além disso, o TypeScript percebeu que no bytebank.ts, existe uma variável chamada saldo e que uma variável com let não pode ser declarada:
+
+Cannot redeclare block-scoped variable 'saldo'. (Não é possível declarar uma variável de bloco chamada 'saldo')
+
+Então, precisamos declarar com nome diferente, por exemplo, "saldo2". Do contrário, teremos conflito entre as duas variáveis. Se tivéssemos utilizando JavaScript, esse tipo de erro seria identificado apenas no momento em que executássemos o código no navegador.
+
+Trocando saldo por valor, já resolvemos o conflito.
+
+```JavaScript
+let valor = 3000; 
+```
+
+Agora, quando colocamos o mouse em cima da variável valor, notamos que o TypeScript atribui a ela o tipo number, que é um dos tipos básicos da linguagem. Mas, por que ele inferou que esse é o tipo dela? Por causa do valor. Atribuímos o número 3000 à variável valor, logo, se passamos um número, o tipo é numérico.
+
+Se passarmos valor e adicionarmos uma string chamada "Cachorro", o TypeScript apontará um problema no código.
+
+```JavaScript
+let valor = 3000;
+valor = "Cachorro";
+```
+
+Embora no JavaScript seja possível trocar os valores de variáveis de forma livre, porque se trata de uma linguagem de tipagem dinâmica, o TypeScript adiciona na linguagem JavaScript a tipagem estática, ou seja, precisamos declarar e seguir os tipos associados às variáveis, às funções e a tudo que for criado no código.
+
+Como ele assumiu que na declaração da variável, o valor era numérico, vai garantir que o valor da variável sempre seja numérico. Nesse caso, estamos tentando atribuir uma string a uma variável numérica, por isso, aparecerá o alerta:
+
+Type 'string' iso not assignable to type 'number'. (O tipo texto não é atribuível ao tipo número)
+
+Mesmo que não tenhamos declarado de forma explícita que o tipo da variável valor é número, o TypeScript inferiu isso por conta do valor inicial da declaração da variável.
+
+Uma boa prática é definir os tipos das nossas variáveis e funções, isto é, declarar a variável e seu tipo.
+
+```JavaScript
+let valor: number = 300; 
+```
+
+Essa variável é numérica, portanto, o TypeScript vai garantir que ela sempre receba um valor numérico ao longo de toda a aplicação. O mesmo vale para uma variável de tipo string.
+
+```JavaScript
+let nome: string = ""; 
+```
+
+Portanto, declaramos o tipo string e garantimos que a variável nome sempre receberá um valor textual. O mesmo vale para outros valores mais básicos, por exemplo, isPago, variável para representar se algo foi pago ou não. Ela será booleana, com valor inicial "falso".
+
+```JavaScript
+let isPago: boolean = false; 
+```
+
+Esses são os tipos básicos da linguagem:
+
+```JavaScript
+let valor: number = 3000;
+let nome: string = "";
+let isPago: boolean = false; 
+```
+
+O TypeScript garante que qualquer tentativa de atribuição de valor a essas variáveis será correspondente ao tipo que elas têm. O controle está feito, mas, e se quiseremos criar uma variável que receba qualquer valor?
+
+Existe um tipo no TypeScript chamado any que significa "qualquer coisa". Com ele, é possível recuperar o comportamento padrão do JavaScript que é fazer com que uma variável aceite qualquer coisa.
+
+```JavaScript
+let qualquer: any = ""; 
+```
+
+Portanto, o tipo any explicita no nosso código que a variável pode receber qualquer valor. Isso significa que variável pode ter desde um objeto até um tipo mais primitivo, como uma string, um numérico ou um booleano. Se precisarmos, de fato, ter uma variável com essa flexibilidade no código, podemos utilizar o tipo any.
+
+Assim, exploramos os valores mais básicos da linguagem com os quais podemos trabalhar:
+
+```JavaScript
+let valor: number = 3000; 
+let nome: string = "";
+let isPago: boolean = false;
+let qualquer: any = "";
+qualquer = 22; 
+```
+
+É sempre recomendável explicitar esses valores para obtermos um controle de tipagem, assim ele ficará bem mais evidente para a pessoa desenvolvedora.
+
+Esses são os tipos primitivos, isto é, os tipos mais básicos da linguagem. Vamos entender como criar tipos mais complexos, propiciando ao nosso código uma robustez que não encontramos com tanta facilidade no JavaScript. Até lá!!
+
+### Aula 2 - Arrays e type alias - Vídeo 4
+
+Transcrição  
+Anteriormente, falamos dos tipos primitivos, number, string, boolean. Agora, vamos falar sobre o array, que é um tipo mais complexo.
+
+Para criarmos arrays no JavaScript, podemos atribuir uma lista vazia à variável ou constante que determinamos.
+
+```JavaScript
+// Arrays
+const lista = []; 
+```
+
+Ao fazermos isso no TypeScript, ele implicitamente identifica que essa lista é de "qualquer coisa". Passando o mouse em lista, aparecerá uma mensagem indicando "const lista: any[]", portanto, lista é um array de qualquer tipo.
+
+Podemos escrever lista.push() e fazer um push de diversos valores, por exemplo, "Jhonathan", "Cachorro", 22, true e até mesmo outro array, [], e o TypeScript aceitará normalmente, porque entende que essa lista pode conter qualquer tipo de valor.
+
+```JavaScript
+// Arrays
+const lista = [];
+lista.push("Jhonathan", "Cachorro", 22, true, [])
+```
+
+Pode acontecer de querermos garantir que a lista seja de números, strings ou booleanos, ou seja, obtermos um controle maior sobre o tipo de dado que pode ser inserido em determinada lista.
+
+É possível acrescentar esse controle maior, deixando nosso código bem mais interessante. Por exemplo, passamos const lista e definimos o tipo number seguido de duplo colchete:
+
+```JavaScript
+// Arrays
+const lista: number[] = [];
+lista.push("Jhonathan", "Cachorro", 22, true, [])
+```
+
+Com isso, o nosso código começou a apresentar alguns problemas, já que estamos fazendo o push() de um valor string para uma lista de números. O alerta do TypeScript é:
+
+Argument of type 'string' is not assignable to parameter os type 'number'. (O argumento do tipo string não é atribuível ao parâmetro do tipo numérico)
+
+Com isso, está garantindo que a lista só pode conter valores numéricos. Então, se trocarmos Jhonathan por 13, o TypeScript aceita o parâmetro e passa o alerta para ao próximo: "Cachorro". Vamos trocar para 22.5. Em seguida, aparece um booleano, true, e vamos substituí-lo por 89. Por fim, um array que é um objeto, e vamos substituí-lo por 1.58.
+
+```JavaScript
+// Tipos primitivos 
+
+let valor: number = 3000; 
+let nome: string = "";
+let isPago: boolean = false;
+let qualquer: any = "";
+qualquer = 22; 
+
+// Arrays 
+
+const lista: number[] = [];
+lista.push(13, 22.5, 22, 89, 1.58);
+```
+
+Está tudo certo! Perceba como o TypeScript aumenta a precisão do nosso código. No JavaScript, só identificaríamos esse tipo de detalhe no momento de execução no navegador, quando os erros aparecem no console.
+
+Nesse caso o erro nem apareceria no console, pois, por natureza, o JavaScript aceita valores de qualquer tipo em listas. Por isso, é bom ter o controle em tempo de compilação antes de colocarmos o nosso código em produção. Nós utilizaremos bastante esse tipo de recurso ao longo do curso, porque teremos que criar listas específicas no nosso código.
+
+Agora, vamos estudar os Tipos Personalizados ou Type Alias que é a possibilidade de criar um tipo nosso. No código anterior, do bytebank.ts, criamos um objeto para gerarmos uma transação.
+
+```JavaScript
+const novaTransacao = { 
+         tipoTransacao: tipoTransacao,
+         valor: valor,
+         data: data, 
+        }
+
+    console.log(novaTransacao);
+        elementoFormulario.reset();
+```
+
+Este é o nosso objeto contendo as propriedades necessárias. Porém, nada garante que esse objeto tenha propriedades com outros nomes ou mesmo propriedades a mais, em relação ao que foi documentado. Lembrando que a documentação dos requisitos diz que uma nova transação precisa sempre e somente os dados: tipo, valor e data da transação.
+
+O objeto, por ser um valor maleável no JavaScript permite criar valores livremente. Então, se criamos um tipo personalizado, conseguimos ter um controle maior do código. Vamos criar uma transação de exemplo.
+
+```JavaScript
+// Tipos Personalizados (Type Alias) 
+
+const novaTransacao = {
+    tipoTransacao: "", 
+        data: new Date(),
+        valor: 0
+}
+```
+
+Criamos uma transação que é um objeto com: tipoTransacao como string;data, que será um new Date(); e valor, que será um valor numérico, por exemplo, 0 (zero).
+
+Nada garante que essa estrutura será mantida. Não existe nada no nosso código que faça isso. Então, vamos declarar um tipo que define a estrutura que uma transação precisa ter. Vamos criar um type Transacao com: um tipoTransacao, que é uma string; data, que é um tipo Date; e valor, que é um tipo numérico, number.
+
+```JavaScript
+// Tipos Personalizados (Type Alias) 
+type Transacao = {
+   tipoTransacao: string;
+     data: Date;
+     valor: number;
+}
+
+const novaTransacao = {
+    tipoTransacao: "", 
+        data: new Date(),
+        valor: 0
+}
+```
+
+Assim, estamos explicitando o que uma transação precisa ter. Agora, se dissermos que o objeto novaTransacao é do tipo Transacao - tipo que acabamos de criar - garantiremos que a estrutura do objeto seguirá exatamente o que foi definido.
+
+```JavaScript
+// Tipos Personalizados (Type Alias) 
+type Transacao = {
+   tipoTransacao: string;
+     data: Date;
+     valor: number;
+}
+
+const novaTransacao: Transacao = {
+    tipoTransacao: "", 
+        data: new Date(),
+        valor: 0
+}
+```
+
+Então, se escrevermos errado o nome de alguma propriedade, por exemplo, valorrs, o TypeScript mostrará um alerta de que a propriedade não existe. Se passarmos uma propriedade para além das especificadas, por exemplo, valorSecundario, o TypeScript gera o mesmo alerta.
+
+Relembrando que está especificado nos requisitos que a nossa transação deve ter somente três dados: tipoTransacao, data e valor. O TypeScript fará com que isso seja respeitado. Todas as vezes em que declararmos a nossa variável com o tipo customizado, o TypeScript fará com que todas as regras declaradas nesse tipo sejam cumpridas.
+
+Por exemplo, o tipoTransacao foi declarado como string, se passarmos um número, o TypeScript também gera um alerta. Isso aumenta a segurança do código e faz com que sua estrutura respeite com muito mais precisão os requisitos do nosso projeto.
+
+Nós utilizaremos esse recurso no nosso projeto para declararmos as transações. Ainda precisamos discutir um item: o controle de valores fixos dentro do nosso código, que realizamos através de enums. Vamos conhecer esse recurso do TypeScript!!
+
+### Aula 2 - Enums - Vídeo 5
+
+Transcrição  
+Conhecemos o type alias e a definição de tipos personalizados no TypeScript. Agora, vamos estudar os enums.
+
+As enumerações ou enums são conjuntos de valores fixos que definimos no nosso código, tornando mais fácil identificar valores na escrita desse código. Em um primeiro momento, essa descrição pode parecer meio confusa, mas, com a parte prática, ficará mais fácil compreender como esse recurso pode ser aplicado.
+
+Nos nossos requisitos, Requisitos.txt, está especificado que cada transação deve conter três valores fixos muito bem definidos: Depósito; Transferência; e Pagamento de Boleto.
+
+```Markdown
+* Cada transação realizada no sistema deve possuir SOMENTE as seguintes informações:
+
+  1) Data da Transação (Date)
+  2) Tipo de Transação (Depósito, Transferência, Pagamento de Boleto)
+  3) Valor da Transação (valor maior que zero)
+ 
+* Sempre que a transação for do tipo DEPÓSITO, o valor da transação deve ser adicionado ao saldo da conta.
+
+* Sempre que a transação for do tipo TRANSFERÊNCIA OU PAGAMENTO DE BOLETO, o valor da transação deve ser subtraído do saldo da conta.
+
+* O saldo deve sempre ser atualizado na tela da aplicação a cada transação realizada.
+```
+
+Precisamos garantir que a string adicionada ao tipo de transação seja um dos três valores,"Depósito, Transferência ou Pagamento de Boleto". Não pode ser "gato", "cachorro" ou "pagamento de conta".
+
+```JavaScript
+// Tipos Personalizados (Type Alias) 
+type Transacao = {
+     tipoTransacao: string;
+     data: Date;
+     valor: number;
+}
+
+const novaTransacao: Transacao = {
+       tipoTransacao: "", 
+        data: new Date(),
+        valor: 0
+}
+```
+
+Mas, exigir que a pessoa que programa tenha certeza que o valor atribuído será um dos três especificados é bastante complicado. Alguém pode, por exemplo, escrever "Transferência" com a primeira letra em minúsculo: "transferência". Outra pessoa talvez esqueça o acento circunflexo: "Transferencia".
+
+Precisamos padronizar a maneira como esses valores serão implementados no tipoTransacao. Além disso, podemos usar o IntelliSense, uma ajuda do Visual Studio Code para sabermos como passar os valores. Como o tipoTransacao é uma string, ele aceita qualquer tipo de texto, não há uma IntelliSense para escrevermos uma string correta.
+
+As enumerações criam um conjunto de valores fixos no código que estabelecem padrões de atribuição desses valores, assim, conseguimos ter IntelliSense, isto é, ajuda do Visual Studio Code para atribuirmos valores corretamente ao longo do nosso código.
+
+Mas, como declaramos uma enum? Logo abaixo do type alias, vamos chamar enum TipoTransacao.
+
+```JavaScript
+// Tipos Personalizados (Type Alias) 
+type Transacao = {
+     tipoTransacao: string;
+     data: Date;
+     valor: number;
+}
+
+// Enum
+enum TipoTransacao {
+
+}
+
+const novaTransacao: Transacao = {
+        tipoTransacao: "", 
+        data: new Date(),
+        valor: 0
+}
+```
+
+Então, temos uma enumeração e podemos definir chaves que identificam os valores que elas representam. Por exemplo, podemos declarar que:
+
+DEPOSITO corresponde a "Depósito";
+
+TRANSFERENCIA corresponde a Transferência;
+
+PAGAMENTO_BOLETO corresponde a "Pagamento de Boleto".
+
+```JavaScript
+// Tipos Personalizados (Type Alias) 
+type Transacao = {
+     tipoTransacao: string;
+     data: Date;
+     valor: number;
+}
+
+// Enum
+enum TipoTransacao {
+    DEPOSITO = "Depósito",
+        TRANSFERENCIA = "Transferência",
+        PAGAMENTO_BOLETO = "Pagamento de Boleto"
+
+}
+
+const novaTransacao: Transacao = {
+        tipoTransacao: "", 
+        data: new Date(),
+        valor: 0
+}
+```
+
+Assim, estamos centralizando na enum chaves e valores que ela representa. Os valores estarão centralizados, isto é, tudo está declarado dentro da enum, em todos os lugares nos quais pegarmos esses valores no código por meio da enum, teremos a certeza de que se trata do valor correto.
+
+No type Transacao, ao invés de definirmos o tipoTransacao como string, vamos definí-lo como TipoTransacao. Ou seja, ele tem que receber um valor válido e declarado dentro da enum, caso contrário, aparecerá um alerta. Isso acontece com tipoTransacao:
+
+```JavaScript
+// código omitido. 
+
+}
+
+const novaTransacao: Transacao = {
+        tipoTransacao: "", 
+        data: new Date(),
+        valor: 0
+}
+```
+
+O alerta é:
+
+Type " " is not assignable to type 'TipoTransacao'.
+
+Significa que uma string vazia não é atribuível à propriedade 'tipoTransacao', porque o tipo dela é do tipo enum, ou seja, representa o TipoTransacao. Portanto, em tipoTransacao só pode haver um valor que exista dentro da enum.
+
+Para atribuir esse valor, basta utilizar o próprio enum, por exemplo, TipoTransacao.DEPOSITO.
+
+```JavaScript
+// código omitido. 
+
+}
+
+const novaTransacao: Transacao = {
+        tipoTransacao: TipoTransacao.DEPOSITO, 
+        data: new Date(),
+        valor: 0
+}
+```
+
+Neste caso, contamos com a ajuda do IntelliSense. Não precisamos nos preocupar em saber se "transferência" tem acento ou não, se "depósito" deve começar com letra maiúscula ou minúscula ou se "pagamento de boleto" tem espaço entre as palavras. Basta utilizar a ajuda da enum para assegurar que o valor correto será atribuído à propriedade do objeto.
+
+A enum serve para exercer um controle centralizado de valores fixos da aplicação e para assegurar que o valor correto está ocorrendo nas várias partes da aplicação.
+
+Estudamos muitos conteúdos! Conhecemos todos os recursos de tipagem que o TypeScritpt oferece e, agora, aprenderemos a transportá-los para a nossa aplicação no bytebank. Vamos lá?!
+
+### Aula 2 - Configurações do tsconfig.json - Exercício
+
+O arquivo tsconfig.json permite a customização do comportamento que o compilador do TypeScript deverá ter em um determinado projeto.
+
+Sabendo-se disso, que comportamento o compilador terá em nosso projeto ao configurarmos a opção “noEmitOnError” com o valor true?
+
+Alternativa correta  
+Com essa configuração o compilador irá gerar os arquivos .js correspondentes apenas se nenhum erro de compilação for detectado no código desses arquivos.
+
+> Manter essa opção ativa faz com que a geração de códigos JavaScript com erros em produção diminua muito.
+
+### Aula 2 - O que aprendemos?
+
+Durante esta segunda aula, exploramos os seguintes tópicos:
+
+- Conhecemos o arquivo tsconfig.json e sua função em um projeto.
+- Aprendemos as vantagens de trabalhar com tipos definidos.
+- Exploramos a criação de tipos personalizados usando Type Alias e também a criação de Arrays tipados no TypeScript.
+- Aprendemos o conceito e a aplicabilidade das Enums.
+
+Com isso, estamos prontos para seguir em frente para a próxima aula!
+
+## Aula 3 - Aplicando o TypeScript
+
+### Aula 3 - Projeto da aula anterior
+
+Caso queira começar daqui, você pode [acessar o projeto da aula anterior](https://github.com/alura-cursos/formacao-typescript-projeto-curso01/tree/aula-2) neste link. Se preferir baixar diretamente, acesse este [link para o download do arquivo zip](https://github.com/alura-cursos/formacao-typescript-projeto-curso01/archive/refs/heads/aula-2.zip).
+
+### Aula 3 -  - Vídeo 1
+### Aula 3 -  - Vídeo 2
+### Aula 3 -  - Vídeo 3
+### Aula 3 -  - Vídeo 4
+### Aula 3 -  - Vídeo 5
+### Aula 3 -  - Vídeo 6
+### Aula 3 -  - Vídeo 7
