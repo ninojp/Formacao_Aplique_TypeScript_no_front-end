@@ -7,7 +7,10 @@
         "forceConsistentCasingInFileNames": true,
         "outDir": "./dist/js/",
         "rootDir": "./src"
-    }
+    },
+    "include": [
+        "src/**/*"
+    ]
 }
 
 //Se todos os seus arquivos TypeScript estão em src, só o "rootDir": "./src" já é suficiente.

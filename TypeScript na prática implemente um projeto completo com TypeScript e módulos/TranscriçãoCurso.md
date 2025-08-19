@@ -1187,10 +1187,832 @@ Com isso, estamos prontos para seguir em frente para a próxima aula!
 
 Caso queira começar daqui, você pode [acessar o projeto da aula anterior](https://github.com/alura-cursos/formacao-typescript-projeto-curso01/tree/aula-2) neste link. Se preferir baixar diretamente, acesse este [link para o download do arquivo zip](https://github.com/alura-cursos/formacao-typescript-projeto-curso01/archive/refs/heads/aula-2.zip).
 
-### Aula 3 -  - Vídeo 1
-### Aula 3 -  - Vídeo 2
-### Aula 3 -  - Vídeo 3
-### Aula 3 -  - Vídeo 4
-### Aula 3 -  - Vídeo 5
-### Aula 3 -  - Vídeo 6
-### Aula 3 -  - Vídeo 7
+### Aula 3 - Reorganização de arquivos - Vídeo 1
+
+Transcrição  
+Anteriormente, conhecemos e escrevemos códigos para explorar as estruturas e recursos que o TypeScript adiciona à linguagem JavaScript. Contudo, corrigimos os erros pelo Visual Studio e por isso não testamos o código ainda.
+
+Vamos fazer isso, adicionando um console.log() no final do arquivo typescript.ts. Entre os parênteses, pediremos para que ele exiba o objeto novaTransacao do tipo customizado Transacao.
+
+```JavaScript
+// Tipos Primitivos
+let valor: number = 3000;
+let nome: string = "";
+let isPago: boolean = false;
+let qualquer: any = "";
+qualquer = 22;
+
+// Arrays
+const lista: number[] = [];
+lista.push(13, 22.5, 22, 89, 1.58);
+
+// Tipos Personalizados (Type Alias)
+type Transacao = {
+    tipoTransacao: TipoTransacao;
+    data: Date;
+    valor: number;
+}
+
+// Enum
+enum TipoTransacao {
+    DEPOSITO = "Depósito",
+    TRANSFERENCIA = "Transferência",
+    PAGAMENTO_BOLETO = "Pagamento de Boleto"
+}
+
+const novaTransacao: Transacao = {
+    tipoTransacao: TipoTransacao.PAGAMENTO_BOLETO,
+    data: new Date(),
+    valor: 0
+}
+
+console.log(novaTransacao);
+```
+
+Vamos abrir o terminal acessando a barra de menus superior, selecionando "View > Terminal" ou simplesmente pressionando "Ctrl+'".
+
+No trecho inferior do programa, acessaremos esse terminal e verificaremos se o compilador do TypeScript está rodando por meio do comando abaixo.
+
+```JavaScript
+tsc -w
+```
+
+Após a execução, ele compilará os arquivos TS. Vamos salvar o arquivo e retornar à nossa aplicação por meio do navegador. Em seu interior, abriremos a aba de ferramentas da pessoa desenvolvedora com F12 e verificaremos o seu retorno clicando em "Object" para expandir seu conteúdo.
+
+```JavaScript
+Object
+    data: Mon Jun 12 2023 15:21:20 GMT-0300 (Horário Padrão de Brasília) {}
+    tipoTransacao "Pagamento de Boleto"
+    valor: 0
+[[Prototype]]: Object
+```
+
+Nele, vemos a transação adicionada como exemplo no arquivo TypeScript, no formato de um objeto do tipo data. O tipoTransacao retorna a string correspondente ao que definimos nas enums e o valor da transação é 0.
+
+Voltando ao VS Code, se adicionarmos no bloco novaTransacao um blablabla que foge do padrão definido, o TypeScript sublinha em vermelho, indicando que esse valor é inválido — afinal, não existe uma propriedade blablabla para o objeto tipado como Transacao.
+
+```JavaScript
+// Tipos Primitivos
+let valor: number = 3000;
+let nome: string = "";
+let isPago: boolean = false;
+let qualquer: any = "";
+qualquer = 22;
+
+// Arrays
+const lista: number[] = [];
+lista.push(13, 22.5, 22, 89, 1.58);
+
+// Tipos Personalizados (Type Alias)
+type Transacao = {
+    tipoTransacao: TipoTransacao;
+    data: Date;
+    valor: number;
+}
+
+// Enum
+enum TipoTransacao {
+    DEPOSITO = "Depósito",
+    TRANSFERENCIA = "Transferência",
+    PAGAMENTO_BOLETO = "Pagamento de Boleto"
+}
+
+const novaTransacao: Transacao = {
+    tipoTransacao: TipoTransacao.PAGAMENTO_BOLETO,
+    data: new Date(),
+    valor: 0
+        blablabla
+}
+
+console.log(novaTransacao);
+```
+
+Definimos no arquivo tsconfig.ts que não deverá haver geração do arquivo TS se nosso código contiver erros. Por isso, ele não gerou o código com erro no diretório "dist" de publicação e nosso código continua funcionando no navegador.
+
+Isso é muito importante: O código que roda no navegador e levamos à produção é aquele publicado na pasta "dist". Com esse controle, o TypeScript diminui a possibilidade de haver erros no código que irá para a produção. Esse detalhe é crucial no desenvolvimento de aplicações grandes que recebem várias influências.
+
+Apesar disso, há alguns tipos de erro que o TypeScript não é capaz de identificar como, por exemplo, erros de ambiente de execução.
+
+Resumindo, ele nos avisa visualmente sobre erros para que sejam corrigidos e não permite que códigos com erro sejam gerados e executados.
+
+Abordamos anteriormente a necessidade de implementar nossos conhecimentos de TypeScript para o código final. Antes disso, vamos reorganizar o código.
+
+Se acessarmos o arquivo bytebank.ts, veremos que o todo o conteúdo está concentrado nele. Vamos começar a reorganização acessando o explorador lateral e criando dois arquivos dentro da pasta "src":
+
+nova-transacao-component.ts, que receberá o código TypeScript para controle de novas transações;
+e saldo-component.ts que receberá o código do saldo.
+Voltando ao arquivo bytebank.ts, selecionaremos e recortaremos a const elementoFormulario e todo o bloco elementoFormulario.addEventListener() que possui o evento de submit() do formulário.
+
+Vamos colar essse conteúdo no arquivo nova-transacao-component.ts.
+
+```JavaScript
+const elementoFormulario = document.querySelector(".block-nova-transacao form") as HTMLFormElement;
+elementoFormulario.addEventListener("submit", function(event) {
+    event.preventDefault();
+    if (!elementoFormulario.checkValidity()) {
+        alert("Por favor, preencha todos os campos da transação!");
+        return;
+    }
+
+    const inputTipoTransacao = elementoFormulario.querySelector("#tipoTransacao") as HTMLSelectElement;
+    const inputValor = elementoFormulario.querySelector("#valor") as HTMLInputElement;
+    const inputData = elementoFormulario.querySelector("#data") as HTMLInputElement;
+
+    let tipoTransacao: string = inputTipoTransacao.value;
+    let valor: number = inputValor.valueAsNumber;
+    let data: Date = new Date(inputData.value);
+
+    if (tipoTransacao == "Depósito") {
+        saldo += valor;
+    } else if (tipoTransacao == "Transferência" || tipoTransacao == "Pagamento de Boleto") {
+        saldo -= valor;
+    } else {
+        alert("Tipo de Transação é inválido!");
+        return;
+    }
+
+    elementoSaldo.textContent = saldo.toString();
+
+    const novaTransacao = {
+        tipoTransacao: tipoTransacao,
+        valor: valor,
+        data: data
+    };
+
+    console.log(novaTransacao);
+    elementoFormulario.reset();
+});
+```
+
+Com isso, o arquivo terá a lógica necessária para o componente de formulário de novas transações funcionar.
+
+O restante do código corresponde ao saldo. Vamos recortá-lo de bytebank.ts e colá-lo no arquivo saldo-component.ts.
+
+```JavaScript
+let saldo = 3000;
+
+const elementoSaldo = document.querySelector(".saldo-valor .valor") as HTMLElement;
+if (elementoSaldo != null) {
+    elementoSaldo.textContent = saldo.toString();
+}
+```
+
+Vamos acessar o explorador e realizar duas operações. Dentro da pasta "src", deletaremos os arquivos bytebank.ts e typescript.ts. Em seguida, por meio da rota de pastas "dist > js", acessaremos o arquivo index.html para importar os dois arquivos criados.
+
+Em seu interior, desceremos ao final do arquivo e buscaremos as linhas de <script>, dentro das quais alteraremos os nomes "bytebank.js" e "typescript.js" pelo nome dos dois novos arquivos
+
+```HTML
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+        <!-- Código omitido -->
+</head>
+<body>
+    <!-- Código omitido -->
+    <main class="container-padding flex">
+            <!-- Código omitido -->
+        </main>
+        <script src="js/saldo-component.js"></script>
+        <script src="js/nova-transacao-component.js"></script>
+</body>
+</html>
+```
+
+Vamos fechar as guias dos arquivos TS abertos, mantendo somente o HTML. Voltando ao explorador, na pasta "dist", podemos deletar a pasta "js" por completo.
+
+Vamos abrir novamente os dois arquivos TS. No interior de cada um, pressionaremos "Enter" abaixo de qualquer bloco e salvaremos o código apenas para solicitar ao compilador do TypeScript que gere uma pasta "js" atualizada, contendo esses dois arquivos.
+
+Com isso, iniciamos a separação de responsabilidades. Cada arquivo possui um código de controle específico.
+
+Nos resta adicionar os componentes novos que aprendemos com o Typescript. A seguir, faremos isso e continuaremos a melhorar nosso código.
+
+### Aula 3 - Uso do Type Alias e Enums - Vídeo 2
+
+Transcrição  
+Após separar os códigos em dois componentes e arquivos distintos importando-os no código HTML, faremos um teste no navegador para verificar se a aplicação continua funcionando.
+
+Na tela de nova transação, faremos um depósito de 300 reais com a data 12/04/2023 e clicaremos em "Concluir transação". Após o clique, veremos que o saldo foi atualizado corretamente e exibe o valor de 3300 reais.
+
+Faremos uma transferência de 150 com a data 20/05/2023 e clicar no mesmo botão. Com isso, veremos que o saldo exibe agora o valor de 3150 reais. Constatamos que tudo funciona mesmo após a refatoração.
+
+Vamos aplicar os recursos do TypeScript que conhecemos. O primeiro deles será o tipo Transacao que definirá a estrutura do que uma transação precisará ter para atingir os requisitos definidos.
+
+Criando o tipo Transacao  
+Voltando ao VS Code, no explorador, criaremos o arquivo Transacao.ts dentro da pasta "src". Em seu interior, definiremos somente o tipo Transacao, adicionando um type Transacao = {}.
+
+Como boa prática, devemos criar um arquivo específico para cada tipo ou enum.
+
+Entre suas chaves, a Transacao possuirá uma estrutura com o tipoTransacao tipado como string inicialmente (posteriormente definiremos o tipo correto).
+
+Abaixo deste, adicionaremos um valor com o tipo number e uma data do tipo Date.
+
+```JavaScript
+type Transacao = {
+    tipoTransacao: string;
+    valor: number;
+    data: Date;
+}
+```
+
+Vamos acessar o arquivo nova-transacao-component.ts e buscar o bloco const novaTransacao no qual criamos o objeto que representará a nova transação. Vamos defini-lo como Transacao para que deixe de ser um objeto livre. Assim, ele seguirá a estrutura do tipo definido em Transacao.ts.
+
+```JavaScript
+const novaTransacao: Transacao = {
+    tipoTransacao: tipoTransacao,
+    valor: valor,
+    data: data,
+}
+```
+
+Quando se tratava de um objeto puro e comum do JavaScript, este bloco aceitava a adição de um blablabla: 'valor qualquer'. A partir do momento que o definimos com o tipo Transacao, o TypeScript restringe a sua estrutura para que siga a definição do seu tipo. Isso aumenta a solidez do código para evitar surpresas.
+
+Se voltarmos ao navegador e atualizarmos a página, não veremos nada novo na aba "Console" pertencente à aba de inspeção. Se realizarmos um depósito de 300 reais na data 12/04/1991 e clicar no botão "Concluir transação", veremos que a transação foi computada e o código continua funcionando mesmo sem importar o arquivo Transacao.js no código de distribuição.
+
+Isso de deve ao seguinte fato: o arquivo JS está vazio.
+
+A criação do arquivo Transacao.ts com o type Transacao gerou um arquivo JS vazio? Sim, pois o JavaScript Vanilla, executado por padrão no navegador, não é capaz de declarar tipos — não existe um type em seu sistema.
+
+Este type é exclusivo do JavaScript e existe para controlar internamente a estrutura dos objetos criados para que sigam a definição criada em seu tipo. Dessa forma, o arquivo JS não faz falta.
+
+Contudo, é importante definir os tipos no momento de desenvolver a aplicação para controlar o padrão dos objetos definido no TypeScript, mesmo que o arquivo resultante esteja vazio.
+
+Definindo o tipoTransacao  
+Precisamos definir o tipoTransacao. Anteriormente, vimos que o tipo das transações são fixos e definidos por meio de enums.
+
+Por meio do explorador, dentro da pasta "src", criaremos o arquivo TipoTransacao.ts com "T" maiúsculo. Em seu interior, criaremos uma enum TipoTransacao também com letras maiúsculas, junto a um bloco de chaves.
+
+Entre as chaves, definiremos os valores abaixo, um por linha, separados por vírgula:
+
+```JavaScript
+DEPOSITO = "Depósito";
+TRANSFERENCIA= "Transferência";
+PAGAMENTO_BOLETO = "Pagamento de Boleto"
+enum TipoTransacao  {
+  DEPOSITO = "Depósito",
+  TRANSFERENCIA = "Transferência",
+  PAGAMENTO_BOLETO = "Pagamento de Boleto"
+}
+```
+
+Voltando ao arquivo Transacao.ts, substituiremos o tipo de transação de string para TipoTransacao no interior do objeto que representa a transação.
+
+```JavaScript
+type Transacao = {
+    tipoTransacao: TipoTransacao;
+    valor: number;
+    data: Date;
+}
+```
+
+Voltando ao arquivo nova-transacao-component.ts, veremos que ocorrerá um erro em todas as ocorrências de tipoTransacao, já que estamos recebendo uma string. Vamos para a linha que declara a tipoTransacao e alterar o seu tipo de string para TipoTransacao.
+
+À sua direita, o valor do inputTipoTransacao recebe um value do tipo string, portanto, converteremos essa string em TipoTransacao adicionando à sua direita um as TipoTransacao.
+
+```JavaScript
+let tipoTransacao: TipoTransacao = inputTipoTransacao.value as TipoTransacao;
+```
+
+Com isso, informamos que a input proveniente do TipoTransacao deve ser uma das definidas no TipoTransacao para seguir a estrutura de tipagem.
+
+Vamos voltar ao navegador e realizar o teste de funcionamento, realizando um depósito de 300 na data 12/04/2023 e pressionando "Concluir transação". Veremos na aba "Console" que a estrutura do objeto tipoTransacao foi exibida, enquanto na aplicação o saldo foi atualizado corretamente.
+
+Faremos uma transferência de 500 reais na data 20/06/2023 e clicaremos no botão de conclusão, verificando no Console que a operação foi registrada com sucesso.
+
+Concluímos que a aplicação está funcionando corretamente. Contudo, voltando ao VS Code, veremos que há um if com o tipoTransacao que compara com strings definidas diretamente no código.
+
+Se lembrarmos bem, ao escrever "transferência" com "T" minúsculo, por exemplo, um erro será apontado pois será diferente do definido na tipagem. Para evitar surpresas relacionadas a formas incorretas de escrita, vamos acessar a enum do tipoTransacao e substituir as strings diretas pelo valor da enum.
+
+```JavaScript
+if (tipoTransacao == TipoTransacao.DEPOSITO) {
+    saldo += valor;
+} else if (tipoTransacao == TipoTransacao.TRANSFERENCIA || tipoTransacao == TipoTransacao.PAGAMENTO_BOLETO) {
+    saldo -= valor;
+} else {
+    alert("Tipo de Transação é inválido!");
+    return;
+}
+```
+
+Com isso, nosso código segue a estrutura definida na tipagem. Vamos acessar o arquivo TipoTransacao.js por meio do navegador e verificar que uma função com valores definidos de retorno foi gerada.
+
+```JavaScript
+var TipoTransacao;
+(function (TipoTransacao) {
+    TipoTransacao["DEPOSITO"] = "Depósito";
+    TipoTransacao["TRANSFERENCIA"] = "Transferência";
+    TipoTransacao["PAGAMENTO BOLETO"] = "Pagamento de Boleto";
+})(TipoTransacao || (TipoTransacao = {}));
+```
+
+Embora tudo esteja funcionando, é interessante importar os arquivos Transacao.js e TipoTransacao.js nos <script>s do index.html para seguir o padrão em que importamos todos os arquivos JS, com ou sem código. Vamos acessá-lo e realizar essa tarefa.
+
+```HTML
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+        <!-- Código omitido -->
+</head>
+<body>
+    <!-- Código omitido -->
+    <main class="container-padding flex">
+            <!-- Código omitido -->
+        </main>
+                <script src="js/Transacao.js"></script>
+                <script src="js/TipoTransacao.js"></script>
+        <script src="js/saldo-component.js"></script>
+        <script src="js/nova-transacao-component.js"></script>
+</body>
+</html>
+```
+
+Posteriormente, refatoraremos esse código para organizá-lo melhor.
+
+Voltaremos ao navegador para verificar novamente se tudo está certo, realizando operações de depósito e transferência com valores e datas aleatórias. Veremos que tudo funciona, mesmo com o nosso código refatorado.
+
+A seguir, continuaremos com as melhorias. Precisamos transformar os valores numéricos em moeda e exibir a data de acesso no bloco de saldo.
+
+### Aula 3 - Formatação de Moeda e Data - Vídeo 3
+
+Transcrição  
+Utilizamos tipos customizados por meio do Type Alias e da Enum. Agora, precisamos aplicar duas coisas:
+
+- A exibição da data de acesso
+- Formatar o valor exibido no saldo para moeda
+- No que tange a data de acesso, vamos exibi-la abaixo das boas-vindas à pessoa usuária e corresponderá à data corrente do computador.
+
+Convertendo o saldo para moeda brasileira  
+Para realizar a conversão em moeda, utilizaremos o método toLocaleString() do JavaScript que fará este processo automaticamente.
+
+Para isso, voltaremos ao arquivo saldo-component.ts, onde temos o elementoSaldo que exibe o saldo na tela. Atualmente, este é exibido em valor numérico, portanto, como boa prática, vamos explicitar o tipo de let saldo como number.
+
+```JavaScript
+let saldo: number = 3000;
+```
+
+Na linha elementoSaldo.textContent = saldo.toString() transformamos o valor do saldo em string e pedimos a sua exibição. Neste caso, queremos que ele formate o valor numérico em uma string específica com o formato de moeda. Para isso, substituiremos o toString() por toLocaleString().
+
+Entre os parênteses, informaremos os parâmetros:
+
+Um pt-br entre aspas duplas para seguir o padrão brasileiro de formatação;
+Um objeto de configuração representado por um par de chaves, cujo interior receberá os valores currency: 'BRL' e style: currency.
+Em style, solicitamos que a formatação ocorra no estilo de moeda. Já em currency, definimos que será utilizada a moeda brasileira.
+
+```JavaScript
+const elementoSaldo = document.querySelector(".saldo-valor .valor") as HTMLElement;
+if (elementoSaldo ≠ null) {
+  elementoSaldo.textContent = saldo.toLocaleString("pt-br", { currency: "BRL", style: "currency" });
+}
+```
+
+Voltando ao navegador, veremos que o valor do saldo aparece na tela no formato moeda e no padrão brasileiro (R$ 3.000,00).
+
+Entretanto, se realizarmos uma transação nessa tela, o valor voltará a ser numérico. Por que isso ocorre?
+
+No arquivo nova-transacao-component.ts, temos o comando elementoSaldo.textContent = saldo,toString() que recolhe o saldo atualizado gerado no if acima dele e o exibe em formato de string, sem a formatação atual.
+
+Vamos substituir o toString() novamente por toLocaleString() informando os mesmos parâmetros.
+
+```JavaScript
+elementoSaldo.textContent = saldo.toLocaleString("pt-br", { style: "currency", currency: "BRL" })
+```
+
+Voltando ao navegador, se realizarmos uma transação de depósito, veremos que a exibição do saldo foi atualizada, mas continua com a formatação em moeda.
+
+Exibindo a data corrente
+Para exibir a data corrente do computador na aplicação, acessaremos o arquivo index.html para descobrir qual elemento exibe essa data. Neste caso, buscaremos a `<section>` denominada block-saldo.
+
+Em seu interior, temos o `<h2>` com o texto "Olá, Joana!". Abaixo dele, temos a tag `<time>` exibindo a data de acesso.
+
+Acessando o arquivo saldo-component.ts, responsável por controlar aquela parte do código, criaremos abaixo da const elemento Saldo uma const elementoDataAcesso que receberá a busca do elemento time no block.saldo do document por meio de um document.querySelector("block-saldo time").
+
+Além disso, ele transformará este elemento em um HTMLElement por meio de um as HTMLElement.
+
+Abaixo desta linha, há um if, abaixo do qual criaremos outro que checará se o elementoDataAcesso é diferente de nulo. Caso seja, o elementoDataAcesso.textContent receberá a data atual fornecida pelo sistema através de um dataAcesso que será formatado por meio do .toLocaleDateString() com parâmetros pt-br entre aspas duplas.
+
+Acima do elementoDataAcesso.textContent, criaremos essa const dataAcesso do tipo Date que receberá um new Date().
+
+```JavaScript
+const elementoSaldo = document.querySelector(".saldo-valor .valor") as HTMLElement;
+const elementoDataAcesso = document.querySelector(".block-saldo time") as HTMLElement;
+
+if (elementoSaldo ≠ null) {
+    // Código omitido
+}
+
+if (elementoDataAcesso null) {
+    const dataAcesso: Date = new Date();
+    elementoDataAcesso.textContent = dataAcesso.toLocaleDateString("pt-br");
+}
+```
+
+Se mantivermos o "pt-br" como único parâmetro de toLocaleString(), a data será retornada com o formato padrão do Brasil, ou seja, dia/mês/ano (DD/MM/AAAA). Se voltarmos ao navegador, veremos abaixo de "Olá, Joana!" a data "12/06/2023", momento de gravação deste vídeo.
+
+À direita de "pt-br", informaremos um objeto de configuração representado por um par de chaves, assim como feito na formatação do saldo. Entre as chaves, informaremos as opções abaixo, uma por linha:
+
+- Um weekday no formato "long";
+- Um day no formato "2-digit";
+- Um month no formato "2-digit";
+- Um year no formato "numeric".
+
+O weekday refere-se à exibição do nome daquele dia da semana. O formato long configura essa exibição para o formato extenso. As opções day e month referem-se ao dia e mês. Ambas usarão o formato de dois dígitos. Já o year refere-se ao ano e será retornado em valor numérico.
+
+```JavaScript
+if (elementoDataAcesso null) {
+    const dataAcesso: Date = new Date();
+    elementoDataAcesso.textContent = dataAcesso.toLocaleDateString("pt-br" {
+        weekday: "long",
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric"
+    });
+}
+```
+
+Após esse processo, voltaremos ao navegador e veremos a data no formato "segunda-feira, 12/06/2023".
+
+Formatamos a data e os valores numéricos. Entretanto, a exibição de datas e valores em moeda não se restringirão ao saldo. Na aba de extrato, localizada no canto direito, também temos valores monetários. Esta seção também receberá uma data referente a cada transação realizada, mas desta vez, no formato dia e mês.
+
+Visto isso, precisaremos utilizar não somente o comando de formatação em vários locais, como também opções de formatação diferentes. Ao invés de digitar esse código em cada local de exibição, podemos centralizá-lo em um único lugar, tornando a manutenção do código mais fácil.
+
+Faremos isso a seguir, por meio de funções.
+
+### Aula 3 - Utilizando funções de formatação em TypeScript - Execício
+
+Você é um desenvolvedor de software do Bytebank Banco Digital e está trabalhando na implementação de um sistema que interage com a API do banco para fornecer informações referentes a saldos e transações de clientes. Uma das suas tarefas é criar funções para formatar a moeda e a data das transações. Para essa tarefa, você utiliza o seguinte código base:
+
+```JavaScript
+function formatarMoeda(valor: number): string {
+    return valor.toLocaleString("pt-br", { style: "currency", currency: "BRL" });
+}
+function formatarData(data: Date, formato: FormatoData = FormatoData.PADRAO): string {
+    if (formato === FormatoData.DIA_SEMANA_DIA_MES_ANO) {
+        return data.toLocaleDateString("pt-br", {
+            weekday: "long",
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric"
+        });
+    }
+    else if (formato === FormatoData.DIA_MES) {
+        return data.toLocaleDateString("pt-br", { day: "2-digit", month: "2-digit" });
+    }
+
+    return data.toLocaleDateString("pt-br");
+}
+```
+
+Utilizando a função formatarMoeda e a função formatarData no código base, considere a situação em que você precisa imprimir na tela a seguinte frase: "Ontem, 23/10, foi transferido o valor de R$ 500,00.". Para atingir essa formatação, quais os argumentos corretos para as funções mencionadas?
+
+Resposta:  
+formatarMoeda(500); e formatarData(new Date("2023-10-23"), FormatoData.DIA_MES);
+
+> Essa opção utiliza corretamente a função formatarMoeda passando o valor 500 como argumento e a função formatarData passando a data "2023-10-23" e o formato 'DIA_MES'.
+
+### Aula 3 - Code Reuse com Funções - Vídeo 4
+
+Transcrição  
+Formatamos o saldo e a data que exibimos na tela. Contudo, vimos que é necessário centralizar esse código, pois vamos utilizá-lo de formas diferentes em outros locais da aplicação.
+
+Para facilitar a manutenção posterior caso haja crescimento da aplicação, é importante efetuar essa refatoração.
+
+Centralizando o código de formatação  
+Voltando ao explorador do VS Code, criaremos o arquivo formatters.ts dentro da pasta "src", onde "formatters" é um nome muito comum para arquivos de formatação de valores em aplicações.
+
+Em seu interior, criaremos a função formatarMoeda() que receberá entre parênteses um valor que deverá ser number. Essa função retornará uma string correspondente ao valor formatado em moeda.
+
+Entre o bloco de chaves da string, adicionaremos um return com o valor, no qual aplicaremos a formatação .toLocaleString() que conhecemos, com os parâmetros pt-br entre aspas duplas e { style: "currency", currency: "BRL" }.
+
+```JavaScript
+function formatarMoeda(valor: number) : string {
+    return valor.toLocaleString("pt-br" { style: "currency", currency: "BRL" });
+}
+```
+
+Abaixo dessa função, criaremos outra denominada formatarData() que receberá entre parênteses a data a ser formatada do tipo Date. Essa função também retornará uma string.
+
+Entre o bloco de chaves da string, adicionaremos um return com a data e a formatação .toLocaleDateString() com os parâmetros pt-br entre aspas duplas e um bloco de chaves com as opções weekday: "long", day: "2-digit", month: "2-digit" e year: "numeric".
+
+```JavaScript
+function formatarMoeda (valor: number): string {
+    return valor.toLocaleString("pt-br", { style: "currency", currency: "BRL" });
+}
+
+function formatarData(data: Date): string {
+    return data.toLocaleDateString("pt-br", {
+weekday: "long",
+day: "2-digit",
+month: "2-digit",
+year: "numeric"
+});
+```
+
+Se tivéssemos que escrever estes blocos toda vez que precisássemos da formatação, teríamos muito trabalho.
+
+Após criarmos os dois formatadores, voltaremos ao arquivo saldo-component.ts e, ao invés de escrever todo o código de formatação, utilizaremos a função formatarData() informando entre parênteses a dataAcesso.
+
+Chamaremos essa nova função em todos os locais nos quais precisamos formatar a data.
+
+No primeiro if, correspondente ao saldo, faremos o mesmo. Substituiremos o retorno de elementoSaldo.textContent para a função formatarMoeda() informando entre parênteses o saldo a ser formatado.
+
+```JavaScript
+if (elementoSaldo ≠ null) {
+    elementoSaldo.textContent = formatarMoeda(saldo);
+}
+
+if (elementoDataAcesso ≠ null) {
+    const dataAcesso: Date = new Date();
+    elementoDataAcesso.textContent = formatarData(dataAcesso);
+}
+```
+
+Acessando o arquivo nova-transacao-component.ts, faremos o mesmo na linha elementoSaldo.textContent, localizada abaixo do if. Vamos substituir o conteúdo que ela recebe por formatarMoeda(saldo).
+
+```JavaScript
+if (tipoTransacao == TipoTransacao.DEPOSITO) {
+    // Código omitido
+}
+
+elementoSaldo.textContent = formatarMoeda(saldo);
+```
+
+Voltaremos ao navegador e, se testarmos a aplicação agora, veremos um erro no console.
+
+Uncaught ReferenceError: formatarMoeda is not defined
+
+Isso ocorre porque criamos as funções somente no TypeScript. Resta importar os arquivos que possuem essas funções no index.html — neste caso, importaremos o formatters.js que foi gerado pelo formatters.ts. Para isso, adicionaremos um novo <script> acima do primeiro.
+
+```HTML
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+        <!-- Código omitido -->
+</head>
+<body>
+    <!-- Código omitido -->
+    <main class="container-padding flex">
+            <!-- Código omitido -->
+        </main>
+                <script src="js/formatters.js"></script>
+        <script src="js/Transacao.js"></script>
+        <script src="js/TipoTransacao.js"></script>
+        <script src="js/saldo-component.js"></script>
+        <script src="js/nova-transacao-component.js"></script>
+</body>
+</html>
+```
+
+Voltando ao navegador, veremos que não há mais erros e tudo funciona. Se realizarmos um depósito ou pagamento para teste, veremos atualizações no saldo em formato de moeda.
+
+Centralizamos o código de formatação de valores de moeda e de data, permitindo que ele seja reutilizado em várias partes do nosso código. Contudo, precisamos criar uma variação na formatação de data.
+
+Neste momento, temos o padrão "dia da semana + dia/mês/ano" na exibição da data de acesso. Todavia, o padrão de exibição no extrato é "dia/mês".
+
+Portanto, embora a formatação de moeda seja a mesma em todo lugar, a data precisará variar de acordo com nossa necessidade.
+
+A seguir, vamos implementar essa variação.
+
+### Aula 3 - Enum para formatos de datas - Vídeo 5
+
+Transcrição  
+No momento de formatar a data, precisamos informar qual formato de data queremos.
+
+Na função formatarData, além da data precisamos passar o formato que queremos aplicar nessa data. Porque dependendo da necessidade podemos precisar de um formato diferente.
+
+Para isso, precisamos definir quais formatos nossa aplicação pode ter. Vamos definir um padrão da mesma maneira que definimos os tipos de transação. Assim nosso código ficará mais claro em relação aos tipos de formatação disponíveis para serem utilizados.
+
+Caso seja necessário expandir isso, podemos expandir essas opções atualizando o código onde for necessário.
+
+No formatarData precisaremos passar um formato.
+
+```JavaScript
+function formatarData(data: Date, formato): string {
+// código omitido
+```
+
+Mas como definir esse formato?
+
+Vamos definir uma enum com formatos de data disponíveis para usarmos na nossa aplicação.
+
+Dentro da pasta "src", vamos criar um arquivo chamado FormatoData.ts.
+
+Dica: ao criar um tipo ou enum é uma boa prática seguirmos esse formato de nomenclatura, primeira letra maiúscula e palavras seguintes com inicial maiúscula. É o chamado Pascal Case.
+
+No arquivo FormatoData.ts teremos o seguinte código:
+
+```JavaScript
+enum FormatoData {
+  PADRAO = "DD/MM/AAAA",
+  DIA_SEMANA_DIA_MES_ANO = "DIA_SEMANA, DD/MM/AAAA",
+  DIA_MES = "DD/MM"
+
+}
+```
+
+Voltando ao formatters.ts, vamos informar que o formato deve seguir o FormatoData. E o valor padrão será FormatoData.PADRAO.
+
+```JavaScript
+function formatarData(data: Date, formato: FormatoData = FormatoData.PADRAO): string {
+  return data.toLocaleDateString("pt-br", {
+    weekday: "long",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric"
+   });
+}
+```
+
+Então, se não for informado um formato específico, ele vai aplicar o formato padrão.
+
+Agora, precisamos atualizar nosso código para referenciar cada um desses tipos.
+
+Colocaremos uma condicional para informar que, se o formato definido for FormatoData.DIA_SEMANA_DIA_MES_ANO vai retornar o que já retorna atualmente. E se o formato for FormatoData.DIA_MES, teremos um return data.toLocaleDateString("pt-br", {day: "2-digit", month: "2-digit"}.
+
+E não for nenhum dos dois, será retornado data.toLocaleDateString("pt-br"), que é o formato padrão.
+
+```JavaScript
+function formatarData(data: Date, formato: FormatoData = FormatoData.PADRAO): string {
+ if (formato == FormatoData.DIA_SEMANA_DIA_MES_ANO) {
+  return data.toLocaleDateString("pt-br", {
+    weekday: "long",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric"
+   });
+  }
+  else if (formato == FormatoData.DIA_MES) {
+     return data.toLocaleDateString("pt-br", {day: "2-digit", month: "2-digit"});
+}
+
+ return data.toLocaleDateString("pt-br");
+}
+```
+
+Feito isso, vamos para o index.html para importar nossa enum. Criaremos uma nova linha de tag script:
+
+```html
+<script src="js/FormatoData.js"></script>
+```
+
+No arquivo saldo-component.ts, como não estamos indicando nenhum formato específico no formatarData, ele está pegando o formato padrão.
+
+Mas, podemos informar que o formato deve ser FormatoData.DIA_SEMANA_DIA_MES_ANO.
+
+Ao verificarmos no navegador, ele está exibindo a formatação solicitada para a exibição de datas no bloco de saldo:
+
+segunda-feira, 12/06/2023
+
+Conclusão  
+Fizemos a nossa atualização de formatação. Agora, vamos explorar alguns problemas que nosso código ainda possui. Está tudo funcionando, mas no próximo vídeo saberemos como podemos melhorar o nosso código e verificar quais falhas ele ainda possui.
+
+### Aula 3 - Problemas do código - Vídeo 6
+
+Transcrição  
+Nosso código está funcionando, implementamos tudo em TypeScript, colocamos os tipos específicos, etc.
+
+Mas nosso código ainda tem algumas falhas a serem resolvidas. Falhas que têm mais a ver com o modo como organizamos nosso código.
+
+A primeira coisa é um problema de ordenação. Como nosso código está sendo implementado de uma forma mais antiga, comparado aos novos padrões, estamos implementando a importação dos arquivos JS diretamente no HTML e de forma explícita.
+
+```html
+<script src="js/FormatoData.js"></script>
+<script src="js/formatters.js"></script>
+<script src="js/Transacao.js"></script>
+<script src="js/TipoTransacao.js"></script>
+<script src="js/saldo-component.js"></script>
+<script src="js/nova-transacao-component.js"></script>
+```
+
+Porém, esse tipo de abordagem tem um problema: a ordenação.
+
+Se mudarmos a ordem desse código e colocar, por exemplo, o saldo-component.js como primeiro código a ser importado, a aplicação vai parar de funcionar. Vai acontecer um erro de referência.
+
+Se acessarmos console do navegador com "F12", veremos a mensagem:
+
+Uncaught ReferenceError: formatarMoeda is not defined a saldo-component.js:5:5
+
+Mas como assim não achou o formatarMoeda? Como assim o formatarMoeda não está definido no código sendo que importamos o formatters que é onde está a função formatarMoeda?
+
+Ele não achou porque uma página HTML é executada de cima para baixo. Então, à medida que os arquivos JavaScript são carregados, eles são executados imediatamente.
+
+No momento em que o navegador capturou e carregou o arquivo saldo-component.js e o executou, ele já leu que para atualizar o elemento saldo seria preciso chamar a função formatarMoeda.
+
+Mas a função formatarMoeda no momento da execução da linha 13 ainda não existe. Ela vai existir só quando o navegador ler a linha 15, `<script src="js/formatters.js"></script>`, que ainda não foi executada. Mas quando ela for executada tudo que está definido no arquivo formatters será carregado em memória.
+
+Então, do jeito que está agora podemos ter esse tipo de problema. Com isso, precisarímos ter cuidado com a ordem em que esses arquivos são escritos no código index, o que é muito complicado em projetos muito grandes.
+
+Esse é o primeiro problema.
+
+O segundo problema, é que não está claro de onde estão vindo algumas partes do código. Por exemplo, o formatarMoeda. Sabemos que existe uma função formatarMoeda, mas no código não está claro de onde está vindo essa função.
+
+Claro que o VS Code e outros editores de código têm atalhos que podemos usar para saber onde a função está sendo definida. Mas o ideal seria que o código fosse mais descritivo e informasse de qual arquivo estamos importando essa função. Para melhorar a legibilidade do código e entendermos rapidamente como ele está funcionando. Sem ficarmos adivinhando ou utilizando os recursos do VS Code para descobrir onde está cada coisa.
+
+O terceiro problema é o conflito de variáveis. Vamos imaginar, por exemplo, que estamos com uma aplicação muito maior e na sua equipe terão várias pessoas programadoras utilizando e fazendo manutenção no mesmo código que você.
+
+E há momentos em que vamos precisar nomear variáveis com nomes que outros arquivos podem ter. Não podemos ficar criando variações tipo saldo2, saldo3, saldo4, etc. Só para não ter conflitos de variáveis.
+
+De alguma forma, precisamos ter o código isolado dos demais. Para que possamos ter a liberdade de colocar nomes comuns de variáveis sem ter que fazer malabarismos em relação aos nomes na estrutura do código.
+
+Outro ponto de atenção é em relação à separação clara de responsabilidades.
+
+Temos o saldo-component que é o responsável por gerenciar tudo que tem a ver com saldo.
+
+Mas, no nova-transacao-component, a cada transação feita também precisamos atualizar o saldo. Mas não é responsabilidade do nova-transacao-component modificar coisas que tem a ver com o saldo. A responsabilidade dele é apenas gerar novas transações. Então, ele está com mais responsabilidade do que deveria.
+
+O certo é, de alguma maneira, o código do nova-transacao-component pedir para o saldo-component atualizar o saldo na interface, porque é responsabilidade dele fazer isso.
+
+A forma mais moderna para resolver esses problemas é utilizar módulos do ECMAScript 6, é o que faremos na próxima aula!
+
+### Aula 3 - Importação dos arquivos JS no HTML - Exercício
+
+Vimos durante esta aula, alguns exemplos de problemas que podem ocorrer ao realizarmos a importação de vários arquivos .js diretamente na página HTML por meio do uso de várias tags `<script>`.
+
+Com isso em mente, qual o principal problema que pode ocorrer ao não termos atenção à ordem em que realizamos as importações dos scripts necessários à aplicação?
+
+Resposta:  
+A ordem de importação dos arquivos .js na página HTML, se feita de forma desatenta, pode influenciar na capacidade do programa encontrar os recursos dos quais depende. Se ao importar um arquivo qualquer este dependender de recursos de um outro que não tenha sido importado e carregado antes dele gerará um erro de Referência, em que o recurso buscado não pode ser encontrado.
+
+> A ordem de importação influencia na capacidade de diferentes partes do código da aplicação encontrarem os recursos dos quais dependem. Se um determinado arquivo .js for carregado sem que o arquivo no qual o recurso de que ele precisa para ser executado tenha sido carregado antes fará com que a aplicação gere um erro de Referência (ReferenceError) informando o desenvolvedor que o recurso requerido não pode ser encontrado. Esse é outro problema que é solucionado por meio do uso de módulos.
+
+### Aula 3 - Faça como eu fiz: exibindo transações formatadas
+
+Você está desenvolvendo uma aplicação para o Bytebank Banco Digital e precisa exibir as informações de transações, como seu valor e a data da transação. Para melhorar a experiência do usuário, você deve formatar corretamente os valores monetários em reais (BRL) e as datas de acordo com os formatos pré-definidos: Padrão (dd/MM/yyyy) ou Dia da Semana, Dia, Mês e Ano.
+
+Utilizando a base de código TypeScript fornecida, crie uma função que recebe o valor da transação e a data, e retorna as informações formatadas em uma única string, no formato: "Data Formatada - Valor Formatado". Para isso, você precisará chamar as funções formatarMoeda e formatarData já fornecidas.
+
+Código TypeScript:
+
+```JavaScript
+function formatarMoeda(valor: number): string {
+    return valor.toLocaleString("pt-br", { style: "currency", currency: "BRL" });
+}
+
+function formatarData(data: Date, formato: FormatoData = FormatoData.PADRAO): string {
+    if (formato === FormatoData.DIA_SEMANA_DIA_MES_ANO) {
+        return data.toLocaleDateString("pt-br", {
+            weekday: "long",
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric"
+        });
+    }
+    else if (formato === FormatoData.DIA_MES) {
+        return data.toLocaleDateString("pt-br", { day: "2-digit", month: "2-digit" });
+    }
+
+    return data.toLocaleDateString("pt-br");
+}
+```
+
+Títulos sugeridos para o exercício:
+
+- Exibindo Transações Formatadas
+- Formatação de Moedas e Datas
+- Apresentação de Transações Bancárias
+
+Opinião do instrutor
+
+```JavaScript
+enum FormatoData {
+    PADRAO,
+    DIA_SEMANA_DIA_MES_ANO,
+    DIA_MES
+}
+
+function formatarInformacoes(valor: number, data: Date, formatoData: FormatoData): string {
+    const dataFormatada = formatarData(data, formatoData);
+    const valorFormatado = formatarMoeda(valor);
+    return `${dataFormatada} - ${valorFormatado}`;
+}
+```
+
+A função formatarInformacoes recebe três parâmetros: valor (number) que representa o valor da transação, data (Date) que representa a data da transação e formatoData (FormatoData) que indica o formato desejado para a data.
+
+A função chama a função formatarData passando a data e o formato desejado para obter a data formatada.
+
+A função chama a função formatarMoeda passando o valor para obter o valor formatado em moeda.
+
+A função retorna uma string concatenando a data formatada, o caractere "-" e o valor formatado, conforme o formato solicitado: "Data Formatada - Valor Formatado".
+
+Dessa forma, ao chamar a função formatarInformacoes com os valores desejados, você obterá as informações formatadas em uma única string, conforme especificado.
+
+### Aula 3 - O que aprendemos?
+
+Ao longo desta terceira aula exploramos os seguintes tópicos:
+
+- Reorganizamos a estrutura de arquivos do projeto;
+- Aplicamos os conceitos apresentados e explorados na aula 2;
+- Realizamos a formatação de moedas e data nos formatos necessários;
+- Analisamos os problemas que ainda persistem na aplicação e que podem ser resolvidos por meio dos módulos.
+- Sendo assim, podemos seguir para a próxima aula!
+
+Sigamos! :)
+
+## Aula 4 - 
+
+### Aula 4 -  - Vídeo 1
+### Aula 4 -  - Vídeo 2
+### Aula 4 -  - Vídeo 3
+### Aula 4 -  - Vídeo 4
+### Aula 4 -  - Vídeo 5
+### Aula 4 -  - Vídeo 6
+### Aula 4 -  - Vídeo 7

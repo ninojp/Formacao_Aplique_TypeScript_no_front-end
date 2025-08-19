@@ -1,12 +1,4 @@
 'use strict';
-let saldo = 3000;
-//-------------------------------------------------------------------------------------------------
-const elementoSaldo = document.querySelector('.saldo-valor .valor');
-if (elementoSaldo) {
-    elementoSaldo.textContent = saldo.toString();
-}
-;
-//-------------------------------------------------------------------------------------------------
 const elementoFormulario = document.querySelector('.block-nova-transacao form');
 elementoFormulario.addEventListener('submit', function (event) {
     event.preventDefault();
@@ -15,16 +7,16 @@ elementoFormulario.addEventListener('submit', function (event) {
         return;
     }
     ;
-    const inputTipoTtransacao = elementoFormulario.querySelector('#tipoTransacao');
+    const inputTipoTransacao = elementoFormulario.querySelector('#tipoTransacao');
     const inputValor = elementoFormulario.querySelector('#valor');
     const inputData = elementoFormulario.querySelector('#data');
-    let tipoTransacao = inputTipoTtransacao.value;
+    let tipoTransacao = inputTipoTransacao.value; // Convertendo o valor do input para o tipo(ENUN) TipoTransacao
     let valor = inputValor.valueAsNumber;
     let data = new Date(inputData.value);
-    if (tipoTransacao == 'Depósito') {
+    if (tipoTransacao == TipoTransacao.DEPOSITO) {
         saldo += valor;
     }
-    else if (tipoTransacao == 'Transferência' || tipoTransacao == 'Pagamento de Boleto') {
+    else if (tipoTransacao == TipoTransacao.TRANSFERENCIA || tipoTransacao == TipoTransacao.PAGAMENTO_BOLETO) {
         saldo -= valor;
     }
     else {
@@ -32,7 +24,7 @@ elementoFormulario.addEventListener('submit', function (event) {
         return;
     }
     ;
-    elementoSaldo.textContent = saldo.toString();
+    elementoSaldo.textContent = formatarMoeda(saldo);
     const novaTransacao = {
         tipoTransacao: tipoTransacao,
         valor: valor,

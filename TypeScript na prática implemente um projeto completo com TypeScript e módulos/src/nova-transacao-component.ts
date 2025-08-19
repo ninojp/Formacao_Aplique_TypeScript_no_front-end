@@ -1,13 +1,5 @@
 'use strict';
 
-let saldo:number = 3000;
-
-//-------------------------------------------------------------------------------------------------
-const elementoSaldo = document.querySelector('.saldo-valor .valor') as HTMLInputElement;
-if (elementoSaldo) {
-    elementoSaldo.textContent = saldo.toString();
-};
-//-------------------------------------------------------------------------------------------------
 const elementoFormulario = document.querySelector('.block-nova-transacao form') as HTMLFormElement;
 elementoFormulario.addEventListener('submit', function(event) {
     event.preventDefault();
@@ -16,25 +8,25 @@ elementoFormulario.addEventListener('submit', function(event) {
         return;
     };
 
-    const inputTipoTtransacao = elementoFormulario.querySelector('#tipoTransacao') as HTMLSelectElement;
+    const inputTipoTransacao = elementoFormulario.querySelector('#tipoTransacao') as HTMLSelectElement;
     const inputValor = elementoFormulario.querySelector('#valor') as HTMLInputElement;
     const inputData = elementoFormulario.querySelector('#data') as HTMLInputElement;
     
-    let tipoTransacao: string = inputTipoTtransacao.value;
+    let tipoTransacao: TipoTransacao = inputTipoTransacao.value as TipoTransacao;// Convertendo o valor do input para o tipo(ENUN) TipoTransacao
     let valor: number = inputValor.valueAsNumber;
     let data: Date = new Date(inputData.value);
 
-    if(tipoTransacao == 'Depósito') {
+    if(tipoTransacao == TipoTransacao.DEPOSITO) {
         saldo += valor;
-    }else if(tipoTransacao == 'Transferência' || tipoTransacao == 'Pagamento de Boleto') {
+    }else if(tipoTransacao == TipoTransacao.TRANSFERENCIA || tipoTransacao == TipoTransacao.PAGAMENTO_BOLETO) {
         saldo -= valor;
     }else{
         alert('Tipo de transação é inválido!');
         return;
     };
-    elementoSaldo.textContent = saldo.toString();
+    elementoSaldo.textContent = formatarMoeda(saldo);
 
-    const novaTransacao = {
+    const novaTransacao: Transacao = {
         tipoTransacao: tipoTransacao,
         valor: valor,
         data: data

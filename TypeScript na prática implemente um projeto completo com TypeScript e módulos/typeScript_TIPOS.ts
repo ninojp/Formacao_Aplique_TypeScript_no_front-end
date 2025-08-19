@@ -18,7 +18,7 @@ listaNum.push(13, 22.5, 89, 1.58);
 //===========================================================================
 
 //Tipos Personalizados (Type Alias)
-type Transacao = {
+type Transacao2 = {
    //tipoTransacao: string;
    tipoTransacao: TipoTransacao;
    data: Date;
@@ -39,9 +39,11 @@ enum TipoTransacao {
     TRANSFERENCIA = "Transferência",
     PAGAMENTO_BOLETO = "Pagamento de Boleto"
 };
-const outraTransacao: Transacao = {
+const outraTransacao: Transacao2 = {
     tipoTransacao: TipoTransacao.DEPOSITO,
     data: new Date(),
     valor: 0
 };
+console.log(outraTransacao);
+
 //===========================================================================
