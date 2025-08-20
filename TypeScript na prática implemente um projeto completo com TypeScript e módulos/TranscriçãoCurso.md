@@ -2007,12 +2007,1031 @@ Ao longo desta terceira aula exploramos os seguintes tópicos:
 
 Sigamos! :)
 
-## Aula 4 - 
+## Aula 4 - Modularizando o TypeScript
 
-### Aula 4 -  - Vídeo 1
-### Aula 4 -  - Vídeo 2
-### Aula 4 -  - Vídeo 3
-### Aula 4 -  - Vídeo 4
-### Aula 4 -  - Vídeo 5
-### Aula 4 -  - Vídeo 6
-### Aula 4 -  - Vídeo 7
+### Aula 4 - Projeto da aula anterior
+
+Caso queira começar daqui, você pode acessar o [projeto da aula anterior neste link](https://github.com/alura-cursos/formacao-typescript-projeto-curso01/tree/aula-3). Se preferir baixar diretamente, acesse este [link para o download do arquivo zip](https://github.com/alura-cursos/formacao-typescript-projeto-curso01/archive/refs/heads/aula-3.zip).
+
+### Aula 4 - Organizando os arquivos como módulos - Vídeo 1
+
+Transcrição  
+Na última aula, notamos que ainda existem problemas na arquitetura da aplicação que podem ser resolvidos por meio dos módulos ES6.
+
+Mas, antes de começarmos a fazer essa implementação, repensaremos a estrutura dos arquivos da aplicação.
+
+Se abrirmos a pasta "src", encontramos todos os arquivos .ts, que possuem funções diferentes. Os arquivos com sufixo component, por exemplo, representam a lógica do TypeScript que interage com a interface.
+
+Também encontramos o formatters.ts, que possui funções auxiliares, e os arquivos de tipo, como FormatoData.ts, TipoTransacao.ts e Transacao.ts.
+
+O que faremos é separar e agrupar cada componente da aplicação em diretórios específicos.
+
+Organizando os arquivos como módulos  
+Primeiro precisamos parar a execução do Typescript. Para isso, abrimos o terminal e apertamos "Ctrl + C".
+
+Em seguida, acessamos a pasta "dist > js". Na pasta "js" clicamos com o botão direito e depois em "Delete".
+
+Feito isso, na pasta "src" criaremos três pastas. Para isso, clicamos nela com o botão direito e depois em "New folder". Nomeamos de "components".
+
+Em seguida criamos a segunda pasta chamada "utils", que irá armazenar arquivos .ts e a pasta "types" que irá guardar os tipos da aplicação.
+
+Agora, arrastaremos os arquivos .ts que correspondem a cada pasta. Ficando da seguinte forma:
+
+- Pasta "components" - nova-transicao-component.ts, saldo.component.ts
+- Pasta "utils" - formatters.ts
+- Pasta "types" - FormatoData.ts, TipoTransacao,ts, Transacao.ts
+
+Feito isso concluímos a organização dos arquivos. Agora, para podermos trabalhar com os módulos ES6, precisamos de um arquivo que centralize a chamada dos arquivos JavaScript.
+
+Se acessarmos a pasta "dist" e o arquivo index.html, percebemos que é preciso importar cada um dos JavaScripts na ordem correta.
+
+Já, quando trabalhamos com arquivos ES6, precisamos de apenas um arquivo no index.html para centralizar as chamadas e importações necessárias.
+
+Dessa forma, como cada arquivo é um módulo, podem importar internamente tudo o que for preciso naquele módulo.
+
+Isso deixa o código mais descritivo, afinal, conseguimos identificar o que ele precisa e o que está sendo importado.
+
+Sendo assim, na pasta "src", criamos um arquivo chamado main.ts. Esse será o arquivo principal da nossa aplicação.
+
+index.html
+
+Então, acessamos o arquivo index.html. Como agora só precisamos fazer uma importação, apagamos todas as existentes.
+
+Precisamos informar que o navegador deve tratar o main.js não como um JavaScript comum e sim como um módulo. Assim ele fará com que os recursos de todos os arquivos importados sejam tratados isoladamente.
+
+Para isso, além do script precisamos passar o atributo type="module" seguido de src="js/main.js". Dessa forma:
+
+```JavaScript
+//trecho omitido
+
+<script type="module" src="js/main.js"></script>
+```
+
+Abrimos o terminal e passamos o comando tsc -w para executarmos novamente o Typescript.
+
+```JavaScript
+tsc -w
+```
+
+Feito isso, após a leitura, a pasta "js" é criada com toda a estrutura correta.
+
+main.ts
+
+Agora, passaremos os módulos que precisam ser executados, ou seja, os que interagem com a interface.
+
+Escrevemos import""./components/nova-transacao-component. Na linha de baixo, fazemos a segunda importação passando import "./components/saldo-component.js.
+
+```JavaScript
+import "./components/nova-transacao-component.js";
+import "./components/saldo-component.js";
+```
+
+Lembre-se que o arquivo .ts se refere ao desenvolvimento, ou seja, é temporario. No momento em que ele é executado na pasta "dist" no navegador esse arquivo precisa ser .js.
+
+Em seguida, abrimos o navegador. Repare que a ferramenta indica um erro no qual não está encontrando a função formataMoeda().
+
+Isso acontece, pois estamos trabalhando com módulos, que isolam o código. Como precisamos que alguns recursos sejam públicos, será necessário refatorar o código.
+
+Faremos isso na aula seguinte.
+
+### Aula 4 - Exportando recursos para uso externo - Vídeo 2
+
+Transcrição  
+Vamos descobrir como tornar público os recursos necessários.
+
+Exportando recursos para uso externo  
+Para isso, acessamos a pasta "utils" e abrimos o arquivo formatters.js. O erro apontou que não estava encontrando a função acharMoeda(), que está isolada em seu módulo.
+
+Para tornarmos essa função disponível, antes de function formatarMoeda(), escrevemos o comando export.
+
+Fazemos o mesmo para a função formatarData(), afinal, ambas precisam estar disponíveis para serem utilizadas em diferentes locais da aplicação.
+
+```JavaScript
+export function formatarMoeda(valor: number): string {
+    return valor.toLocaleString("pt-br", { style: "currency", currency: "BRL" });
+}
+
+export function formatarData(data: Date, formato: FormatoData = FormatoData.PADRAO): string {
+    if (formato === FormatoData.DIA_SEMANA_DIA_MES_ANO) {
+        return data.toLocaleDateString("pt-br", {
+            weekday: "long",
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric"
+        });
+    } else if (formato === FormatoData.DIA_MES) {
+        return data.toLocaleDateString("pt-br", { day: "2-digit", month: "2-digit" });
+    }
+
+    return data.toLocaleDateString("pt-br");
+}
+```
+
+Repare que no módulo formatters.ts estamos utilizando recursos que também são externos. Um exemplo é o FormatoData, um módulo que está na pasta "types".
+
+FormatoData.ts
+
+Então, acessamos esse arquivo e antes de enum FormatoData{} passamos o export.
+
+```JavaScript
+export enum FormatoData {
+    PADRAO = "DD/MM/AAAA",
+    DIA_SEMANA_DIA_MES_ANO = "DIA_SEMANA, DD/MM/AAAA",
+    DIA_MES = "DD/MM"
+}
+```
+
+formatters.ts
+
+Feito isso, voltamos para o arquivo formatters.ts. Na primeira linha, importaremos o recurso escrevendo import { FormatoData } from "../types/FormatoData.js";.
+
+```JavaScript
+import { FormatoData } from "../types/FormatoData.js";
+
+//trecho omitido
+```
+
+Repare que, dentro de cada módulo, podemos definir exatamente o que ele precisa. Sendo assim, a utilização dos módulos é uma solução para o problema referente a ordem de importação HTML.
+
+Aproveitaremos para adicionar o export nos demais módulos.
+
+TipoTransacao.ts
+
+Fazemos isso no TipoTransacao.ts, conforme abaixo:
+
+```JavaScript
+export enum TipoTransacao {
+    DEPOSITO = "Depósito",
+    TRANSFERENCIA = "Transferência",
+    PAGAMENTO_BOLETO = "Pagamento de Boleto"
+}
+```
+
+Transacao.ts
+
+Repetimos o mesmo no módulo Transacao.ts. Além disso, repare que o VS Code indica que o TipoTransacao nao foi importado.
+
+Sendo assim, na primeira linha passamos import { TipoTransacao } from "./TipoTransacao.js". Dessa forma:
+
+```JavaScript
+import { TipoTransacao } from "./TipoTransacao.js";
+
+export type Transacao = {
+    tipoTransacao: TipoTransacao;
+    valor: number;
+    data: Date;
+}
+```
+
+Repare que o VS Code faz o import do TipoTransacaosem o .js. Isso acontece, pois a ferramenta utiliza métodos de framework, como o React, que geralmente não usam a extensão do componente.
+
+Porém, como estamos trabalhando com Typescript puro, precisamos realizar essa especificação.
+
+nova-transacao-component.ts
+
+Ao abrir o arquivo nova-transacao-component.ts, notamos vários trechos de código sublinhados em vermelho. Para corrigir isso, faremos as importações necessárias.
+
+Primeiro, passamos import { formatarMoeda } from "../utils/formatters.js". Na linha abaixo, importamos o { Transacao } from "../types/Transacao.js" seguido de { TipoTransacao } from "../types/TipoTransacao.js".
+
+```JavaScript
+import { formatarMoeda } from "../utils/formatters.js"; 
+import { Transacao } from "../types/Transacao.js"; 
+import { TipoTransacao } from "../types/TipoTransacao.js";
+
+//trecho omitido
+```
+
+saldo-components.ts
+
+Após abrimos o arquivo saldo-components.ts para realizar as importações.
+
+Na primeira linha, escrevemos import { formatarData, formatarMoeda } from "../utils/formatters.js". Na linha abaixo import { FormatoData } from "../types/FormatoData.js".
+
+```JavaScript
+import { formatarData, formatarMoeda } from "../utils/formatters.js";
+import { FormatoData } from "../types/FormatoData.js";
+
+//trecho omitido
+```
+
+Mesmo com essas alterações, se rodarmos o código agora não teremos o resultado esperado.
+
+Se voltarmos no arquivo nova-transacao-component.ts repare que ainda o trecho salvo e elementoSaldo estão sublinhados em vermelho.
+
+Esse erro acontece pelo mesmo motivo, ou seja, porque cada módulo é isolado. Sendo assim, só funciona no seu próprio componente, o saldo-component.ts.
+
+Isso significa que temos um novo problema para ser resolvido. Temos muitas responsabilidades no módulo nova-transacao-component.ts que não são dele.
+
+Para corrigir, precisamos expor informações de saldo e atualização do saldo-component.ts para que os outros módulos possam utilizar esse dado. Tudo isso, mantendo a responsabilidade para o módulo correto.
+
+### Aula 4 - Tornando as informações de saldo acessíveis - Vídeo 3
+
+Transcrição  
+Nesse vídeo, resolveremos o problema da exposição das informações do saldo. Dessa forma, os outros componentes que precisarem, poderão utilizá-las.
+
+Tornando as informações de saldo acessíveis
+
+saldo-component.ts
+
+No módulo saldo-component.ts encontramos as informações do saldo e entre a linha 9 e 11 a exibição do saldo na tela.
+
+Esse trecho de código precisa estar disponível para outros módulos poderem chamá-lo e executá-lo, como as transações.
+
+Para isso, no fim do código criamos uma função chamada getSaldo() que retornará number { return saldo }. Para que ela fique disponível, no início dessa linha de código passamos export.
+
+Abaixo, criamos outra função chamada atualizarSaldo() que receberá como parâmetro novoSaldo: number. Como não terá retorno, passamos void. Adicionamos chaves e dentro passamos o retorno, que será saldo = novoSaldo;.
+
+Essa última função irá pegar o saldo, atualizar o valor, formatá-lo e depois exibir o resultado na tela.
+
+Sendo assim, recortamos todo o trecho de código da linha 9 até a 11 e colamos na função atualizarSaldo().
+
+```JavaScript
+//trecho omitido
+
+export function getSaldo(): number {
+        return saldo;
+}
+
+export function atualizarSaldo(novoSaldo: number): void { 
+        saldo = novosaldo;
+          if (elementoSaldo != null) {
+        elementoSaldo.textContent = formatarMoeda(saldo);
+}
+```
+
+Dessa forma, o if() só será executado quando a função atualizarSaldo() for chamada. Porém, precisamos que o saldo seja exibido na tela assim que a interface da aplicação for carregada.
+
+Então, na linha acima dessa função, passamos atualizarSaldo(saldo);.
+
+```JavaScript
+//trecho omitido
+
+atualizarSaldo(saldo);
+export function atualizarSaldo(novoSaldo: number): void { 
+        saldo = novosaldo;
+          if (elementoSaldo != null) {
+        elementoSaldo.textContent = formatarMoeda(saldo);
+}
+```
+
+nova-transacao-component.ts
+
+Feito isso, voltamos para o arquivo nova-transacao-component.ts. Na linha 20, abaixo de Date, criaremos uma variável chamada saldo:number que irá receber getSaldo().
+
+Ao escrever o código o VS Code faz a importação do getSaldo.
+
+Assim, o saldo passa pela variável, que atualiza o valor conforme o tipo de transação, podendo ser depósito ou transferência.
+
+Em seguida, na linha 32, ao invés de atualizar o saldo diretamente na interface, pediremos para o componente atualizar, já que isso é uma responsabilidade dele.
+
+Então, apagamos essa linha e passamos a função atualizarSaldo(saldo).
+
+Assim, mantemos a responsabilidade de tudo relacionado a saldo para o saldo-component.ts.
+
+Repare que a primeira linha de código, referente ao import formatarMoeda está com a cor mais clara.
+
+Isso acontece, pois o VS Code identifica que esse recurso não está sendo utilizado nesse módulo. Então, podemos apagá-la.
+
+```JavaScript
+import Transacao } from "../types/Transacao.js";
+import { TipoTransacao } from "../types/TipoTransacao.js";
+import { atualizarSaldo, getSaldo } from "./saldo-component.js";
+
+const elementoFormulario = document.querySelector(".block-nova-transacao form") as HTMLFormElement; elementoFormulario.addEventListener("submit", function(event) {
+        event.preventDefault();
+        if (!elementoFormulario.checkValidity()) { 
+            alert("Por favor, preencha todos os campos da transação!");
+            return;
+}
+
+const inputTipoTransacao = elemento Formulario.querySelector("#tipoTransacao") as HTMLSelectElement;
+const inputValor elementoFormulario.querySelector("#valor") as HTMLInputElement;
+const inputData = elementoFormulario.querySelector("#data") as HTMLInputElement;
+
+let tipoTransacao: TipoTransacao = inputTipoTransacao.value as TipoTransacao;
+let valor: number inputValor.valueAsNumber;
+let data: Date = new Date(inputData.value);
+let saldo: number = getSaldo();
+
+if (tipoTransacao == TipoTransacao.DEPOSITO) {
+        saldo += valor;} 
+    else if (tipoTransacao TipoTransacao.TRANSFERENCIA || tipoTransacao == TipoTransacao.PAGAMENTO_BOLETO) {
+        saldo -= valor;
+    } else {
+        alert("Tipo de Transação é inválido!");
+        return;
+I
+atualizarSaldo(saldo);
+//trecho omitido
+```
+
+Em seguida, abrimos o navegador para checar se deu certo. Não temos erros no console, isso é bom. Para termos certeza de que está tudo certo, simularemos uma transação.
+
+Selecionamos a opção depósito, definimos o valor de R$500, a data do dia e clicamos em "Concluir transação". Feito isso, o valor do saldo atualiza. Deu certo!
+
+Repetimos o mesmo procedimento selecionando a opção "Transferência" e também da certo.
+
+Tudo está funcionando! Porém, podemos refinar um pouco mais as responsabilidades da aplicação.
+
+No vídeo seguinte vamos analisar se os componentes estão com suas responsabilidades ou se ainda há módulos com muitas responsabilidades.
+
+### Aula 4 - Importação e exportação de módulos - Exercício
+
+Você está desenvolvendo uma solução para o Bytebank Banco Digital e precisa organizar o código de maneira modular, seguindo os conceitos de Modularização e utilizando Módulos ES6. Para isso, você escolhe utilizar import e export para comunicar os diferentes módulos de sua aplicação.
+
+Como você deve proceder para importar uma função chamada depositar exportada como padrão do módulo saldo.ts e utilizá-la no módulo transacoes.ts?
+
+Resposta:  
+import depositar from "./saldo.js";
+depositar(1000);
+
+> Esta é a forma correta de importar e utilizar a função depositar do módulo saldo.ts no módulo transacoes.ts, considerando que a função depositar foi exportada como padrão no módulo saldo.ts.
+
+### Aula 4 - Repensando a divisão das responsabilidades - Vídeo 4
+
+Transcrição  
+Tudo parece perfeito, nossa aplicação funciona normalmente, separamos em módulos, organizamos a estrutura de arquivos por pastas, temos módulos que contêm tipos, módulos que interagem com a interface, funções utilitárias, e assim por diante. Porém, podemos refinar ainda mais nosso código!
+
+Repensando a divisão das responsabilidades  
+Se analisarmos nossa estrutura nesse momento, identificaremos que o módulo nova-transacao-component.ts ainda tem muitas responsabilidades.
+
+Em uma aplicação, é interessante separar de forma bastante detalhada a lógica de negócio, estrutura mais básica de como as coisas devem funcionar, as operações que devem funcionar e os tipos de operações que são válidas ou inválidas.
+
+Além disso, temos as partes que interagem com a interface, as partes que definem os tipos da nossa aplicação, as partes que definem funções utilitárias definidas no arquivo formatters.ts.
+
+Sempre que formos analisar a estrutura de uma aplicação, precisaremos ir até os mínimos detalhes. Analisando o arquivo nova-transacao-component.ts, os componentes da nossa aplicação devem interagir apenas com a interface; essa é a responsabilidade deles.
+
+Sendo assim, a responsabilidade do módulo nova-transacao-component.ts é gerenciar o formulário de nova transação para registrá-la, coletar as informações, e repassá-las para alguém. Ou seja, não é responsabilidade desse módulo definir se a operação deve aumentar ou diminuir o saldo.
+
+Isso é lógica de negócio e deve ser colocado em outra camada da nossa aplicação, em outro tipo de módulo que seja responsável por esse controle.
+
+Conforme dito anteriormente, a responsabilidade de nova-transacao-components.ts é interagir com o formulário, coletar os dados, verificar se eles estão corretos, e repassar isso para um módulo chamado, por exemplo, Conta, que faça o registro da transação efetivamente.
+
+O mesmo é válido para o módulo saldo-component.ts. Não é responsabilidade desse módulo ter o saldo guardado. A responsabilidade dele é exibir o saldo e a data de acesso, pois essas informações estão no mesmo bloco da interface.
+
+Então, temos dois módulos que estão com muitas responsabilidades, as quais, inicialmente, não seriam deles. Nesse cenário, vamos acessar o arquivo Requisitos.txt e começar a repensar a estrutura.
+
+O ideal é que as informações da conta, como o saldo, as transações realizadas e a data de acesso, tenham um módulo exclusivo para guardá-las mantê-las. Essas informações devem ser centralizadas e disponibilizadas para os diferentes módulos que precisarem.
+
+Sendo assim, no arquivo Requisitos.txt, vamos definir o seguinte:
+
+```md
+* As informações da conta devem ficar num módulo específico "Conta"
+- Saldo
+- Data de Acesso
+- Registro de Transações realizadas
+- Histórico de transações
+```
+
+Centralizaremos todas essas informações em um módulo chamado "Conta", e quem precisar delas, irá chamar o módulo Conta que as contêm.
+
+Para os componentes, definiremos os módulos de nova transação e de saldo, cuja única responsabilidade é interagir com a interface. No arquivo de requisitos, teremos o seguinte:
+
+```md
+* Os componentes
+  - Nova transação: deve apenas coletar as informações do form da interface e repassar os dados para o módulo Conta 
+  - Saldo: deve exibir as informações de data de acesso e do saldo para o usuário na interface acessando esses dados através do módulo Conta 
+```
+
+O módulo de nova transação deverá se preocupar apenas com o funcionamento do formulário, a coleta dos dados dos campos, a validação dos dados de forma básica, e por fim, repassar os dados para registro do módulo Conta.
+
+Então, o módulo Conta faz o registro de fato, e o formulário apenas coleta os dados para verificar se os dados estão válidos e repassar as informações para o módulo responsável pelo registro das transações.
+
+Esse módulo Conta irá centralizar as informações necessárias da conta, ou seja, o saldo, a data de acesso, o registro das transações, e o histórico de transações.
+
+Por outro lado, os módulos que precisarem das informações irão chamar o módulo Conta para obter os recursos necessários, sendo que o módulo de nova transação precisa do recurso de registro de transações novas, o de extrato precisa do histórico das transações, e o de saldo precisa da data de acesso e do índice do saldo atual.
+
+Feita a reestruturação, vamos entender como transferir isso para o código!
+
+### Aula 4 - Centralizando a lógica de saldo e operações - Vídeo 5
+
+Transcrição  
+Segundo o que definimos nos requisitos e a organização que estruturamos, vamos começar a definir as responsabilidades novamente, organizando nosso código ao redor dos requisitos.
+
+- Centralizando a lógica de saldo e operações
+- Organização do código e criação do módulo Conta
+- Na pasta "types", criaremos um novo arquivo chamado Conta.ts, um módulo que irá representar nossa conta. Primeiramente, vamos declarar o saldo com o tipo number e o valor de 3000, da mesma forma que fizemos no arquivo saldo-component.ts.
+
+let saldo: number = 3000;
+
+Em seguida, criaremos um objeto que chamaremos de Conta. Ele terá alguns recursos que irão representar a Conta. O primeiro deles será o método getSaldo(), que irá retornar o saldo da conta (saldo).
+
+```JavaScript
+const Conta = {
+    getSaldo() {
+        return saldo;
+    },
+}
+```
+
+O próximo método que iremos adicionar é o getDataAcesso(). Ele irá retornar um Date que corresponde à data de acesso atual, ou seja, new Date().
+
+```JavaScript
+getDataAcesso(): Date {
+    return new Date();
+},
+```
+
+Por fim, teremos um terceiro método de registro das transações, chamado registrarTransacao(). Esse método irá receber uma novaTransacao a ser registrada, que é um objeto do tipo Transacao. Além disso, ele irá retornar void, ou seja, não haverá retorno como resultado.
+
+```JavaScript
+registrarTransacao(novaTransacao: Transacao): void {
+}
+```
+
+Automaticamente, será feita a importação de Transacao na primeira linha do código.
+
+```JavaScript
+import { Transacao } from "./Transacao.js";
+```
+
+O método registrarTransacao() precisa verificar que tipo de transação está sendo realizada e fazer a atualização do saldo de acordo com esse tipo.
+
+Esse tipo de lógica já está definido no arquivo nova-transacao-component.ts: temos o bloco if entre as linhas de código 22 e 29, que verifica o tipo de transação e realiza a atualização do saldo.
+
+Então, vamos recortar todo esse bloco e colar no arquivo Conta.ts, dentro do método registrarTransacao():
+
+```JavaScript
+registrarTransacao(novaTransacao: Transacao): void {
+    if (tipoTransacao == TipoTransacao.DEPOSITO) {
+        saldo += valor;
+    } 
+    else if (tipoTransacao == TipoTransacao.TRANSFERENCIA || tipoTransacao == TipoTransacao.PAGAMENTO_BOLETO) {
+        saldo -= valor;
+    } 
+    else {
+        alert("Tipo de Transação é inválido!");
+        return;
+    }
+}
+```
+
+Ao fazer isso, o TypeScript irá reclamar alguns erros. Primeiro, precisamos importar o enum TipoTransacao. Faremos isso na segunda linha do código.
+
+```JavaScript
+import { TipoTransacao } from "./TipoTransacao.js";
+```
+
+Na linha 16 do bloco if, o que está definido como tipoTransacao logo após a abertura de parênteses, na verdade, é a propriedade tipoTransacao que está dentro de novaTransacao. Então, colocaremos novaTransacao.tipoTransacao.
+
+```JavaScript
+if (novaTransacao.tipoTransacao == TipoTransacao.DEPOSITO)
+```
+
+Com isso, verificamos se a transação é do tipo depósito. Faremos o mesmo para os outros dois tipos de transação, substituindo tipoTransacao por novaTransacao.tipoTransacao.
+
+```JavaScript
+else if (novaTransacao.tipoTransacao == TipoTransacao.TRANSFERENCIA || novaTransacao.tipoTransacao == TipoTransacao.PAGAMENTO_BOLETO)
+```
+
+O próximo passo é atualizar o saldo de acordo com o valor da nova transação, passado como parâmetro do método registrarTransacao(). Para isso, vamos substituir valor por novaTransacao.valor, tanto na linha 17 quanto na linha 20.
+
+```JavaScript
+saldo += novaTransacao.valor;
+```
+
+```JavaScript
+saldo -= novaTransacao.valor;
+```
+
+Dessa forma, pegamos os valores das novas transações e somamos ao saldo quando o tipo de transação for depósito, e subtraímos do saldo quando for transferência ou pagamento de boleto. Assim, atualizamos o saldo do módulo Conta.
+
+Para finalizar, abaixo do else no bloco if, podemos usar a função console.log() recebendo a novaTransacao, para garantir que ela funciona corretamente.
+
+```JavaScript
+console.log(novaTransacao);
+```
+
+O módulo Conta está praticamente pronto. Precisamos apenas exportar esse objeto para representar nossa conta. Faremos isso com o export default.
+
+```JavaScript
+export default Conta;
+```
+
+Resultado do arquivo Conta.ts:
+
+```JavaScript
+import { Transacao } from "./Transacao.js";
+import { TipoTransacao } from "./TipoTransacao.js";
+
+let saldo: number = 3000;
+
+const Conta = {
+    getSaldo() {
+        return saldo;
+    },
+
+    getDataAcesso(): Date {
+        return new Date();
+    },
+
+    registrarTransacao(novaTransacao: Transacao): void {
+        if (novaTransacao.tipoTransacao == TipoTransacao.DEPOSITO) {
+            saldo += novaTransacao.valor;
+        } 
+        else if (novaTransacao.tipoTransacao == TipoTransacao.TRANSFERENCIA || novaTransacao.tipoTransacao == TipoTransacao.PAGAMENTO_BOLETO) {
+            saldo -= novaTransacao.valor;
+        } 
+        else {
+            alert("Tipo de Transação é inválido!");
+            return;
+        }
+
+        console.log(novaTransacao);
+    }
+}
+
+export default Conta;
+```
+
+Poderíamos simplesmente usar export Conta, mas o export default é mais comum quando exportamos um único objeto para representar o módulo. Porém, ele não é obrigatório.
+
+Lembrando que, dentro de um módulo, podemos ter apenas um item exportado dessa forma.
+
+Atualização do arquivo nova-transacao-component.ts
+Feito isso, vamos acessar o arquivo nova-transacao-component.ts. Em vez de nos preocuparmos com a coleta e atualização do saldo, vamos apagar os trechos correspondentes, que são as linhas 20 e 24 do código, e fazer outro processo.
+
+Trechos a serem removidos:
+
+```JavaScript
+let saldo: number = getSaldo();
+```
+
+```JavaScript
+atualizarSaldo(saldo);
+```
+
+Após remover os trechos, iremos coletar os dados do formulário e montar o objeto Transacao para representar a novaTransacao. Para isso, chamaremos o objeto Conta com o método registrarTransacao(), que será autoimportado do módulo Conta.js na linha 4 do código.
+
+```JavaScript
+import Conta from "../types/Conta.js";
+```
+
+Passaremos para esse método a novaTransacao, pois agora é responsabilidade desse módulo fazer o registro da transação na aplicação.
+
+```JavaScript
+Conta.registrarTransacao(novaTransacao);
+```
+
+Feito isso, podemos remover a função console.log() da linha 29, pois já temos essa informação no arquivo Conta.ts.
+
+Trecho a ser removido:
+
+```JavaScript
+console.log(novaTransacao);
+```
+
+Finalizamos o código de nova-transacao-component.ts.
+
+Atualização do arquivo saldo-component.ts  
+Agora, ao realizar uma nova transação, precisamos atualizar o saldo na tela. As informações de saldo agora estão no arquivo Conta.ts, então, de alguma forma, precisamos fazer com que o módulo saldo-component.ts exiba as informações trazendo os dados do objeto Conta.
+
+De acordo com o arquivo Requisitos.txt, já temos o saldo, a data de acesso, e o registro de transações realizadas no arquivo Conta.ts. Quanto aos componentes, precisamos realizar a busca das informações do módulo para fazer a exibição.
+
+No caso da nova transação, precisamos apenas do método de registro, que já fizemos no arquivo nova-transacao-component.ts. Já no caso do saldo, precisamos puxar os dados do arquivo Conta.ts para então exibir.
+
+Em saldo.component.ts, podemos remover a linha de código 4, pois esse arquivo não contém mais os dados de saldo, ou seja, são dados que virão de fora.
+
+Trecho a ser removido:
+
+```JavaScript
+let saldo: number = 3000;
+```
+
+Além disso, não precisamos mais da função getSaldo():
+
+Trecho a ser removido:
+
+```JavaScript
+export function getSaldo(): number {
+    return saldo;
+}
+```
+
+O método atualizarSaldo() logo abaixo pode ser chamado de outra forma, como atualizar(), por exemplo. A única coisa que esse método irá fazer será buscar os dados do Conta.ts e exibir na tela, então não precisamos das verificações de novoSaldo.
+
+Nessa função, precisamos apenas saber se elementSaldo existe, ou seja, se ele é diferente de nulo, e formatar o que vier do saldo da conta. Então, na função formatarMoeda(), vamos adicionar Conta.getSaldo().
+
+```JavaScript
+atualizar();
+export function atualizar(): void {
+    if (elementoSaldo ≠ null) {
+        elementoSaldo.textContent = formatarMoeda(Conta.getSaldo());
+    }
+}
+```
+
+Nessa etapa, o objeto Conta será reclamado, então faremos a importação na linha 3:
+
+```JavaScript
+import Conta from "../types/Conta.js";
+```
+
+Com isso, sempre que for chamada a função atualizar() do módulo saldo-component.ts, será exibido na tela para a pessoa usuária o saldo da conta formatado em moeda.
+
+Porém, seguindo o padrão de Conta, seria interessante ter um objeto que representasse o saldo-component.ts, pois da forma como está agora, estamos apenas expondo a função atualizar(). O ideal seria ter um objeto para representar o módulo de forma geral, colocando dentro dele todos os recursos necessários.
+
+O primeiro passo é remover o export da função atualizar(). Em seguida, vamos renomeá-la para renderizarSaldo(), que corresponde à exibição do saldo na tela propriamente dita.
+
+```JavaScript
+renderizarSaldo();
+function renderizarSaldo(): void {
+    if (elementoSaldo ≠ null) {
+        elementoSaldo.textContent = formatarMoeda(Conta.getSaldo());
+    }
+}
+```
+
+Abaixo da função, vamos criar um objeto chamado SaldoComponent, que irá conter o método atualizar(). Esse método irá chamar a função interna renderizarSaldo().
+
+```JavaScript
+const SaldoComponent = {
+    atualizar() {
+        renderizarSaldo();
+    }
+}
+```
+
+Para finalizar, usaremos o export default com o objeto SaldoComponent.
+
+```JavaScript
+export default SaldoComponent;
+```
+
+Dessa forma, a única coisa que estará disponível para uso do componente de saldo é o objeto SaldoComponent, que irá representar todo o componente, com o método atualizar() que chama a função interna renderizarSaldo().
+
+A data de acesso (dataAcesso) também virá do componente Conta. Então, no bloco if localizado na linha 8, em vez de ter a linha 9 coletando a data do computador, chamaremos Conta.getDataAcesso() na linha 10.
+
+```JavaScript
+if (elementoDataAcesso != null) {
+    elementoDataAcesso.textContent = formatarData(Conta.getDataAcesso(), FormatoData.DIA_SEMANA_DIA_MES_ANO);
+}
+```
+
+Trecho a ser removido:
+
+```JavaScript
+const dataAcesso: Date = new Date();
+```
+
+Dessa forma, será retornada a data de acesso formatada, que centralizamos no módulo Conta.
+
+Resultado do arquivo saldo-component.ts:
+
+```JavaScript
+import { formatarData, formatarMoeda } from "../utils/formatters.js";
+import { FormatoData } from "../types/FormatoData.js";
+import Conta from "../types/Conta.js";
+
+const elementoSaldo = document.querySelector(".saldo-valor .valor") as HTMLElement;
+const elementoDataAcesso = document.querySelector(".block-saldo time") as HTMLElement;
+
+if (elementoDataAcesso != null) {
+    elementoDataAcesso.textContent = formatarData(Conta.getDataAcesso(), FormatoData.DIA_SEMANA_DIA_MES_ANO);
+}
+
+renderizarSaldo();
+function renderizarSaldo(): void {
+    if (elementoSaldo != null) {
+        elementoSaldo.textContent = formatarMoeda(Conta.getSaldo());
+    }
+}
+
+const SaldoComponent = {
+    atualizar() {
+        renderizarSaldo();
+    }
+}
+
+export default SaldoComponent;
+```
+
+Temos uma separação mais clara no código!
+
+Segunda atualização do arquivo nova-transacao-component.ts
+Agora vamos retornar ao arquivo nova-transacao-component.ts. Na linha 3, é reclamado o erro de que importamos recursos que não existem mais (atualizarSaldo e getSaldo), então vamos substituí-los pelo objeto SaldoComponent.
+
+```JavaScript
+import SaldoComponent from "./saldo-component.js";
+```
+
+Usaremos o objeto SaldoComponent para atualizar o saldo na tela. Então, na linha 29, chamaremos esse objeto seguido do método atualizar().
+
+```JavaScript
+SaldoComponent.atualizar()
+```
+
+Com isso, atingimos a separação determinada nos requisitos. Em relação ao saldo, temos a exibição dos dados vindos do módulo Saldo. Além disso, temos a centralização dos registros nesse mesmo módulo, com todas as informações dentro de um módulo de responsabilidade única.
+
+Testes na aplicação  
+Podemos fazer nosso teste na aplicação no navegador, para conferir se tudo continua funcionando corretamente. Preencheremos o formulário com os seguintes valores:
+
+Tipo de transação: "Depósito";  
+Valor: 500;  
+Data: 20/05/2023.
+
+Após concluir a transação, devemos ter as atualizações corretas na aplicação.
+
+Vamos testar também outro tipo de transação:
+
+Tipo de transação: "Transferência";  
+Valor: 200;  
+Data: 30/06/2023.
+
+Enviado o formulário, teremos a subtração do saldo da conta.
+
+Conclusão  
+Tudo continua funcionando corretamente, mas agora com uma separação um pouco melhor e mais sofisticada, conforme programado.
+
+Com isso, conseguimos fechar o funcionamento da nossa aplicação dentro do que planejamos!
+
+### Aula 4 - Desafio: modularizando visualização Data e Saldo
+
+O Bytebank Banco Digital precisa reorganizar seu código de visualização de saldos e datas de acesso de seus clientes. Eles querem usar modularização para facilitar o entendimento e manutenção do código. Crie um novo arquivo para lidar com a exibição do saldo e outro arquivo para lidar com a exibição das datas de acesso, aplicando a modularização dos módulos ES6 no TypeScript.
+
+Opinião do instrutor
+
+No arquivo 'saldo-component.ts', importamos as funções necessárias para formatar a moeda e o tipo da conta, definimos o elemento do DOM onde exibiremos o saldo e criamos a função 'renderizarSaldo' para atualizar o saldo do cliente. Em seguida, declaramos e exportamos o módulo 'SaldoComponent' com seu método 'atualizar' que chama a função 'renderizarSaldo'.
+
+```JavaScript
+import { formatarMoeda } from "../utils/formatters";
+import { Conta } from "../types/Conta";
+
+const elementoSaldo = document.querySelector(".saldo-valor .valor") as HTMLElement;
+
+function renderizarSaldo(): void {
+    if (elementoSaldo !== null) {
+        elementoSaldo.textContent = formatarMoeda(Conta.getSaldo());
+    }
+}
+
+const SaldoComponent = {
+    atualizar: function () {
+        renderizarSaldo();
+    },
+};
+
+export default SaldoComponent;
+```
+
+No arquivo 'data-component.ts', fazemos algo semelhante: importamos as funções e tipos necessários, definimos o elemento do DOM onde exibiremos a data, e criamos a função 'renderizarData' para atualizar a data de acesso do cliente. Por fim, declaramos e exportamos o módulo 'DataComponent'.
+
+```JavaScript
+import { formatarData } from "../utils/formatters";
+import { FormatoData } from "../types/FormatoData";
+import { Conta } from "../types/Conta";
+
+const elementoDataAcesso = document.querySelector(".block-saldo time") as HTMLElement;
+
+function renderizarData(): void {
+    if (elementoDataAcesso !== null) {
+        elementoDataAcesso.textContent = formatarData(Conta.getDataAcesso(), FormatoData.DIA_SEMANA_DIA_MES_ANO);
+    }
+}
+
+const DataComponent = {
+    atualizar: function () {
+        renderizarData();
+    },
+};
+
+export default DataComponent;
+```
+
+Dessa forma, conseguimos separar as funcionalidades de exibição de saldo e data de acesso em arquivos separados, facilitando a manutenção e entendimento do código.
+
+Lembre-se que para funcionar o novo componente que exibe a data de acesso do usuário, devemos realizar a importação deste componente no arquivo main.ts que centraliza a inicialização dos componentes visuais da aplicação.
+
+### Aula 4 - O que aprendemos?
+
+Durante esta quarta aula, exploramos os seguintes tópicos:
+
+- Compreendemos as vantagens da utilização de módulos na criação de aplicações com TypeScript.
+- Reestruturamos o projeto, redefinindo os papéis e responsabilidades de cada componente ou módulo da aplicação.
+- Utilizamos os comandos import/export para importar recursos de outros módulos e disponibilizá-los para uso.
+
+Agora, estamos prontos para finalizar nosso projeto.
+
+## Aula 5 - Finalizando o Projeto do TypeScript
+
+### Aula 5 - Lançamentos e captura de erros - Vídeo 1
+
+Transcrição
+Continuando a nossa aplicação, precisamos estar atentos a alguns comportamentos que podem causar resultados inesperados.
+
+Um desses comportamentos é realizar uma transferência de valor maior que o saldo disponível. Vamos testar!
+
+Temos um saldo de R$ 3.000,00 e faremos uma transferência no valor de R$ 4.000,00. Esta transação não deveria ser aceita, mas ao concluí-la ela é realizada e o saldo passa a ser de - R$ 1.000,00, ou seja, fica negativo. Sendo assim, precisamos validar este tipo de operação.
+
+Outra situação que pode acontecer é alguém tentar burlar o sistema. Ao inspecionar a página e o elemento tipoTransacao, poderia inserir uma opção inválida à sequência de opções de transação. Vamos testar!
+
+Ao inspecionar a página, expandimos o seguinte elemento:
+
+<select name="tipoTransacao" id="tipoTransacao" class="campo-input" required> == $0
+Copiar código
+Dentro desta tag, constam algumas opções de transação:
+
+<select name="tipoTransacao" id="tipoTransacao" class="campo-input" required> == $0
+    <option value>Selecione o tipo de transação</option> 
+    <option value="Depósito">Depósito</option>
+    <option value="Transferência">Transferência</option>
+    <option value="Pagamento de Boleto">Pagamento de Boleto</option>
+Copiar código
+Vamos copiar a última opção, <option value="Pagamento de Boleto">Pagamento de Boleto</option>. Para isso, clicamos sobre ela com o botão direito do mouse e vamos em Copy > Copy element. Em seguida, com o botão direito do mouse clicaremos sobre a tag <select> e vamos em "Edit as HTML" para editá-la.
+
+Após a última opção, colaremos a tag copiada e a editaremos da seguinte forma para ser uma opção inválida:
+
+<option value="Saque">Saque</option>
+Copiar código
+O código HTML deste trecho ficará assim:
+
+<select name="tipoTransacao" id="tipoTransacao" class="campo-input" required> == $0
+    <option value>Selecione o tipo de transação</option> 
+    <option value="Depósito">Depósito</option>
+    <option value="Transferência">Transferência</option>
+    <option value="Pagamento de Boleto">Pagamento de Boleto</option>
+    <option value="Saque">Saque</option>
+Copiar código
+Você deve lembrar que fizemos uma validação e, por isso, essa opção não passará. Porém, de volta à aplicação, ao selecionar a opção de saque no valor de R$ 500,00 e concluí-la recebemos a mensagem "Tipo de Transação é inválido!" e o formulário é limpo.
+
+Essa limpeza não deveria acontecer, pois essa é uma sequência na execução do código. No trecho a seguir, presente no arquivo "nova-transacao-component.ts", vemos que ele tenta registrar a transação, atualiza o saldo e reseta o formulário:
+
+Conta.registrarTransacao(novaTransacao); SaldoComponent.atualizar();
+elementoFormulario.reset();
+Copiar código
+Mas, ao identificar que a transação é inválida, as linhas seguintes não deveriam ser executadas e, portanto, o formulário não devia ser limpo. O que acontece, porém, é que, embora a transação não seja registrada, o formulário é resetado.
+
+Isso ocorre por conta de como estamos validando. Se verificarmos o arquivo "Conta.ts", observamos que estamos apenas exibindo um alerta e parando a execução do método registrarTransacao() com a chamada do return. Ou seja, a partir da chama do retorno, nada é executado, mas isso apenas dentro do método.
+
+Fora do método, no arquivo "nova-transacao-component.ts", onde este método é chamado, todas as linhas seguintes são executadas.
+
+A melhor maneira de tratar essa questão é através do lançamento de erros, porque a aplicação como um todo vai parar de executar sempre que algum erro for lançado.
+
+Para isso, no arquivo "Conta.ts", ao invés de exibirmos o alerta (alert("Tipo de Transação é inválido!")), vamos lançar um erro com esta mesma mensagem e remover o retorno:
+
+else {
+    throw new Error("Tipo de Transação é inválido!");
+}
+Copiar código
+Dessa forma, ao invés de simplesmente exibir o alerta, vamos avisar a aplicação que houve um erro e passar a mensagem relativa a este erro.
+
+Da mesma maneira, vamos validar as operações condicionais de depósito e transferência que estão no método registrarTransacao(). Para isso, vamos criar duas funções após let saldo: number = 3000.
+
+A primeira função se chamará debitar() e receberá um valor numérico:
+
+function debitar(valor: number): void{
+
+}
+Copiar código
+A segunda função se chamará depositar() e também receberá um valor numérico:
+
+function depositar(valor: number): void{
+
+}
+Copiar código
+Na função de debitar(), o valor recebido será retirado do saldo. Já em depositar(), o valor recebido será acrescentado ao saldo.
+
+function debitar(valor: number): void{
+    saldo -= valor;
+}
+
+function depositar(valor: number): void{
+    saldo += valor;
+}
+Copiar código
+Porém, antes de fazermos essas atualizações, queremos saber se as operações de debitar ou depositar são válidas, então faremos duas validações.
+
+Para debitar(), antes de retirar o valor do saldo, vamos verificar se ele é menor ou igual a zero, já que não é possível debitar valores negativos. Sendo esta condição verdadeira, vamos lançar um erro com a mensagem "O valor a ser debitado deve ser maior que zero!":
+
+function debitar(valor: number): void{
+    if (valor <= 0) {
+        throw new Error("O valor a ser debitado deve ser maior que zero!");
+    }
+    saldo -= valor;
+}
+
+function depositar(valor: number): void{
+    saldo += valor;
+}
+Copiar código
+Seguiremos um procedimento semelhante para a função depositar(): se o valor de depósito for menor ou igual a zero, será inválido e um erro com a mensagem "O valor a ser depositado deve ser maior que zero!" será lançado:
+
+function debitar(valor: number): void{
+    if (valor <= 0) {
+        throw new Error("O valor a ser debitado deve ser maior que zero!");
+    }
+    saldo -= valor;
+}
+
+function depositar(valor: number): void{
+    if (valor <= 0) {
+        throw new Error("O valor a ser depositado deve ser maior que zero!");
+    }
+    saldo += valor;
+}
+Copiar código
+Outra validação importante a ser feita na função debitar() é que o valor a ser debitado não deve ser maior que o saldo. Se for, a operação não deve ser realizada e um erro será lançado com a mensagem "Saldo insuficiente!":
+
+function debitar(valor: number): void{
+    if (valor <= 0) {
+        throw new Error("O valor a ser debitado deve ser maior que zero!");
+    }
+    if (valor > saldo) {
+        throw new Error("Saldo insuficiente!");
+    }
+    saldo -= valor;
+}
+
+function depositar(valor: number): void{
+    if (valor <= 0) {
+        throw new Error("O valor a ser depositado deve ser maior que zero!");
+    }
+    saldo += valor;
+}
+Copiar código
+Nossa aplicação está lançando os erros correspondentes, então, no método registrarTransacao(), ao invés de fazer diretamente a transação, chamaremos as funções que fazer a validação.
+
+Para o depósito, chamamos a função depositar(), passando o valor da nova transação. Para transferência ou pagamento de boleto, chamamos a função debitar(), também passando o valor da nova transação:
+
+registrarTransacao(novaTransacao: Transacao): void {
+        if (novaTransacao.tipoTransacao == TipoTransacao.DEPOSITO) {
+            depositar(novaTransacao.valor);
+        } 
+        else if (novaTransacao.tipoTransacao == TipoTransacao.TRANSFERENCIA || novaTransacao.tipoTransacao == TipoTransacao.PAGAMENTO_BOLETO) {
+            debitar(novaTransacao.valor);
+        } 
+        else {
+            throw new Error("Tipo de Transação é inválido!");
+        }
+
+        console.log(novaTransacao);
+    }
+}
+Copiar código
+Vamos salvar, voltar ao navegador e tentar realizar uma transferência de R$ 4.000,00. Em seguida, vamos abrir o console e concluí-la para ver o que acontece.
+
+Perceba que o erro de "Saldo insuficiente!" foi lançado no console e não na tela do navegador para a pessoa usuária. Sendo assim, precisamos criar uma maneira de capturar os erros para exibir a mensagem correspondente à pessoa usuária.
+
+No arquivo "nova-transacao-component.ts", vamos colocar o código dentro de um bloco de tratamento de erro try...catch. Sendo assim, o código após a linha elementoFormulario será envolto do bloco try.
+
+Assim, tentará executar o que consta no código do bloco try e, ao final, se acontecer algum problema, criaremos o bloco catch para capturar o erro gerado e exibir a mensagem.
+
+elementoFormulario.addEventListener("submit", function(event) {
+    try 
+    {
+        event.preventDefault();
+        if (!elementoFormulario.checkValidity()) {
+            alert("Por favor, preencha todos os campos da transação!");
+            return;
+        }
+
+        const inputTipoTransacao = elementoFormulario.querySelector("#tipoTransacao") as HTMLSelectElement;
+        const inputValor = elementoFormulario.querySelector("#valor") as HTMLInputElement;
+        const inputData = elementoFormulario.querySelector("#data") as HTMLInputElement;
+
+        let tipoTransacao: TipoTransacao = inputTipoTransacao.value as TipoTransacao;
+        let valor: number = inputValor.valueAsNumber;
+        let data: Date = new Date(inputData.value + " 00:00:00");
+
+        const novaTransacao: Transacao = {
+            tipoTransacao: tipoTransacao,
+            valor: valor, 
+            data: data,
+        }
+
+        Conta.registrarTransacao(novaTransacao);
+        SaldoComponent.atualizar();
+        ExtratoComponent.atualizar();
+        elementoFormulario.reset();
+    }
+    catch(erro) {
+        alert(erro.message);
+    }
+});
+Copiar código
+Agora, qualquer erro que acontecer será capturado pelo bloco try e transferio para o bloco catch que fará o tratamento, no caso, exibir o alerta.
+
+De volta ao navegador, vamos tentar novamente fazer a transação inválida de transferência no valor de R$ 5.000,00. Ao concluí-la, recebemos a mensagem de que o saldo é insuficiente.
+
+Com isso, temos um tratamento mais sofisticado para os erros da nossa aplicação. Ou seja, podemos centralizar os envios de mensagens de erro através dos lançamentos de erro e o blocos try...catch os capturam.
+
+Agora, vamos refazer o procedimento de editar o HTML da página e incluir a opção de saque para ver o comportamento da opção inválida:
+
+<select name="tipoTransacao" id="tipoTransacao" class="campo-input" required> == $0
+    <option value>Selecione o tipo de transação</option> 
+    <option value="Depósito">Depósito</option>
+    <option value="Transferência">Transferência</option>
+    <option value="Pagamento de Boleto">Pagamento de Boleto</option>
+    <option value="Saque">Saque</option>
+Copiar código
+Ao fazê-lo e tentar utilizar esta opção de saque no valor de R$ 5.000,00, recebemos a mensagem de que a transação é inválida e o formulário não é mais limpo. Com isso, temos certeza que a aplicação está parando de executar na linha de código em questão e não seguindo para as próximas linhas.
+
+Fechamos o tratamento de erros e podemos seguir para o próximo desafio!
+
+### Aula 5 -  - Vídeo 2
+### Aula 5 -  - Vídeo 3
+### Aula 5 -  - Vídeo 4
+### Aula 5 -  - Vídeo 5
+### Aula 5 -  - Vídeo 6
+### Aula 5 -  - Vídeo 7
+### Aula 5 -  - Vídeo 8

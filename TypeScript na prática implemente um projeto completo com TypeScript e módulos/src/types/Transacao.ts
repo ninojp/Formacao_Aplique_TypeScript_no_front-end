@@ -1,6 +1,7 @@
 'use strict';
+import { TipoTransacao } from "./TipoTransacao.js";
 
-type Transacao = {
+export type Transacao = {
     tipoTransacao: TipoTransacao;
     valor: number;
     data: Date;

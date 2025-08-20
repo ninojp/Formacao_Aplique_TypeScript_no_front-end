@@ -1,4 +1,8 @@
 'use strict';
+import Conta from "../types/Conta.js";
+import { TipoTransacao } from "../types/TipoTransacao.js";
+import { Transacao } from "../types/Transacao.js";
+import SaldoComponent from "./saldo-component.js";
 
 const elementoFormulario = document.querySelector('.block-nova-transacao form') as HTMLFormElement;
 elementoFormulario.addEventListener('submit', function(event) {
@@ -7,31 +11,22 @@ elementoFormulario.addEventListener('submit', function(event) {
         alert('Por Favor, Preencha todos os campos da transação!');
         return;
     };
-
+    //---------------------------------------------------------------------------------------------------
     const inputTipoTransacao = elementoFormulario.querySelector('#tipoTransacao') as HTMLSelectElement;
     const inputValor = elementoFormulario.querySelector('#valor') as HTMLInputElement;
     const inputData = elementoFormulario.querySelector('#data') as HTMLInputElement;
-    
+    //---------------------------------------------------------------------------------------------------
     let tipoTransacao: TipoTransacao = inputTipoTransacao.value as TipoTransacao;// Convertendo o valor do input para o tipo(ENUN) TipoTransacao
     let valor: number = inputValor.valueAsNumber;
     let data: Date = new Date(inputData.value);
-
-    if(tipoTransacao == TipoTransacao.DEPOSITO) {
-        saldo += valor;
-    }else if(tipoTransacao == TipoTransacao.TRANSFERENCIA || tipoTransacao == TipoTransacao.PAGAMENTO_BOLETO) {
-        saldo -= valor;
-    }else{
-        alert('Tipo de transação é inválido!');
-        return;
-    };
-    elementoSaldo.textContent = formatarMoeda(saldo);
-
+    //---------------------------------------------------------------------------------------------------
     const novaTransacao: Transacao = {
         tipoTransacao: tipoTransacao,
         valor: valor,
         data: data
     };
-
-    console.log(novaTransacao);
+    //---------------------------------------------------------------------------------------------------
+    Conta.registrarTransacao(novaTransacao);
+    SaldoComponent.atualizar();
     elementoFormulario.reset();
 });

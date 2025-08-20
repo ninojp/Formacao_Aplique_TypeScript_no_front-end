@@ -2,7 +2,7 @@
     "compilerOptions": {
         "target": "es2024",
         "noEmitOnError": true,
-        "module": "commonjs",
+        "module": "esnext",
         "strict": true,
         "forceConsistentCasingInFileNames": true,
         "outDir": "./dist/js/",
