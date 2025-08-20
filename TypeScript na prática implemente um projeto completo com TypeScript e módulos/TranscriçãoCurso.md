@@ -2816,7 +2816,7 @@ Agora, estamos prontos para finalizar nosso projeto.
 
 ### Aula 5 - Lançamentos e captura de erros - Vídeo 1
 
-Transcrição
+Transcrição  
 Continuando a nossa aplicação, precisamos estar atentos a alguns comportamentos que podem causar resultados inesperados.
 
 Um desses comportamentos é realizar uma transferência de valor maior que o saldo disponível. Vamos testar!
@@ -2827,38 +2827,49 @@ Outra situação que pode acontecer é alguém tentar burlar o sistema. Ao inspe
 
 Ao inspecionar a página, expandimos o seguinte elemento:
 
+```html
 <select name="tipoTransacao" id="tipoTransacao" class="campo-input" required> == $0
-Copiar código
+```
+
 Dentro desta tag, constam algumas opções de transação:
 
+```html
 <select name="tipoTransacao" id="tipoTransacao" class="campo-input" required> == $0
     <option value>Selecione o tipo de transação</option> 
     <option value="Depósito">Depósito</option>
     <option value="Transferência">Transferência</option>
     <option value="Pagamento de Boleto">Pagamento de Boleto</option>
-Copiar código
-Vamos copiar a última opção, <option value="Pagamento de Boleto">Pagamento de Boleto</option>. Para isso, clicamos sobre ela com o botão direito do mouse e vamos em Copy > Copy element. Em seguida, com o botão direito do mouse clicaremos sobre a tag <select> e vamos em "Edit as HTML" para editá-la.
+```
+
+Vamos copiar a última opção, `<option value="Pagamento de Boleto">`Pagamento de Boleto`</option>`. Para isso, clicamos sobre ela com o botão direito do mouse e vamos em Copy > Copy element. Em seguida, com o botão direito do mouse clicaremos sobre a tag `<select>` e vamos em "Edit as HTML" para editá-la.
 
 Após a última opção, colaremos a tag copiada e a editaremos da seguinte forma para ser uma opção inválida:
 
+```html
 <option value="Saque">Saque</option>
-Copiar código
+```
+
 O código HTML deste trecho ficará assim:
 
+```html
 <select name="tipoTransacao" id="tipoTransacao" class="campo-input" required> == $0
     <option value>Selecione o tipo de transação</option> 
     <option value="Depósito">Depósito</option>
     <option value="Transferência">Transferência</option>
     <option value="Pagamento de Boleto">Pagamento de Boleto</option>
     <option value="Saque">Saque</option>
-Copiar código
+```
+
 Você deve lembrar que fizemos uma validação e, por isso, essa opção não passará. Porém, de volta à aplicação, ao selecionar a opção de saque no valor de R$ 500,00 e concluí-la recebemos a mensagem "Tipo de Transação é inválido!" e o formulário é limpo.
 
 Essa limpeza não deveria acontecer, pois essa é uma sequência na execução do código. No trecho a seguir, presente no arquivo "nova-transacao-component.ts", vemos que ele tenta registrar a transação, atualiza o saldo e reseta o formulário:
 
-Conta.registrarTransacao(novaTransacao); SaldoComponent.atualizar();
+```JavaScript
+Conta.registrarTransacao(novaTransacao);  
+SaldoComponent.atualizar();  
 elementoFormulario.reset();
-Copiar código
+```
+
 Mas, ao identificar que a transação é inválida, as linhas seguintes não deveriam ser executadas e, portanto, o formulário não devia ser limpo. O que acontece, porém, é que, embora a transação não seja registrada, o formulário é resetado.
 
 Isso ocorre por conta de como estamos validando. Se verificarmos o arquivo "Conta.ts", observamos que estamos apenas exibindo um alerta e parando a execução do método registrarTransacao() com a chamada do return. Ou seja, a partir da chama do retorno, nada é executado, mas isso apenas dentro do método.
@@ -2869,28 +2880,35 @@ A melhor maneira de tratar essa questão é através do lançamento de erros, po
 
 Para isso, no arquivo "Conta.ts", ao invés de exibirmos o alerta (alert("Tipo de Transação é inválido!")), vamos lançar um erro com esta mesma mensagem e remover o retorno:
 
+```JavaScript
 else {
     throw new Error("Tipo de Transação é inválido!");
 }
-Copiar código
+```
+
 Dessa forma, ao invés de simplesmente exibir o alerta, vamos avisar a aplicação que houve um erro e passar a mensagem relativa a este erro.
 
 Da mesma maneira, vamos validar as operações condicionais de depósito e transferência que estão no método registrarTransacao(). Para isso, vamos criar duas funções após let saldo: number = 3000.
 
 A primeira função se chamará debitar() e receberá um valor numérico:
 
+```JavaScript
 function debitar(valor: number): void{
 
 }
-Copiar código
+```
+
 A segunda função se chamará depositar() e também receberá um valor numérico:
 
+```JavaScript
 function depositar(valor: number): void{
 
 }
-Copiar código
+```
+
 Na função de debitar(), o valor recebido será retirado do saldo. Já em depositar(), o valor recebido será acrescentado ao saldo.
 
+```JavaScript
 function debitar(valor: number): void{
     saldo -= valor;
 }
@@ -2898,11 +2916,13 @@ function debitar(valor: number): void{
 function depositar(valor: number): void{
     saldo += valor;
 }
-Copiar código
+```
+
 Porém, antes de fazermos essas atualizações, queremos saber se as operações de debitar ou depositar são válidas, então faremos duas validações.
 
 Para debitar(), antes de retirar o valor do saldo, vamos verificar se ele é menor ou igual a zero, já que não é possível debitar valores negativos. Sendo esta condição verdadeira, vamos lançar um erro com a mensagem "O valor a ser debitado deve ser maior que zero!":
 
+```JavaScript
 function debitar(valor: number): void{
     if (valor <= 0) {
         throw new Error("O valor a ser debitado deve ser maior que zero!");
@@ -2913,9 +2933,11 @@ function debitar(valor: number): void{
 function depositar(valor: number): void{
     saldo += valor;
 }
-Copiar código
+```
+
 Seguiremos um procedimento semelhante para a função depositar(): se o valor de depósito for menor ou igual a zero, será inválido e um erro com a mensagem "O valor a ser depositado deve ser maior que zero!" será lançado:
 
+```JavaScript
 function debitar(valor: number): void{
     if (valor <= 0) {
         throw new Error("O valor a ser debitado deve ser maior que zero!");
@@ -2929,9 +2951,11 @@ function depositar(valor: number): void{
     }
     saldo += valor;
 }
-Copiar código
+```
+
 Outra validação importante a ser feita na função debitar() é que o valor a ser debitado não deve ser maior que o saldo. Se for, a operação não deve ser realizada e um erro será lançado com a mensagem "Saldo insuficiente!":
 
+```JavaScript
 function debitar(valor: number): void{
     if (valor <= 0) {
         throw new Error("O valor a ser debitado deve ser maior que zero!");
@@ -2948,11 +2972,13 @@ function depositar(valor: number): void{
     }
     saldo += valor;
 }
-Copiar código
+```
+
 Nossa aplicação está lançando os erros correspondentes, então, no método registrarTransacao(), ao invés de fazer diretamente a transação, chamaremos as funções que fazer a validação.
 
 Para o depósito, chamamos a função depositar(), passando o valor da nova transação. Para transferência ou pagamento de boleto, chamamos a função debitar(), também passando o valor da nova transação:
 
+```JavaScript
 registrarTransacao(novaTransacao: Transacao): void {
         if (novaTransacao.tipoTransacao == TipoTransacao.DEPOSITO) {
             depositar(novaTransacao.valor);
@@ -2967,7 +2993,8 @@ registrarTransacao(novaTransacao: Transacao): void {
         console.log(novaTransacao);
     }
 }
-Copiar código
+```
+
 Vamos salvar, voltar ao navegador e tentar realizar uma transferência de R$ 4.000,00. Em seguida, vamos abrir o console e concluí-la para ver o que acontece.
 
 Perceba que o erro de "Saldo insuficiente!" foi lançado no console e não na tela do navegador para a pessoa usuária. Sendo assim, precisamos criar uma maneira de capturar os erros para exibir a mensagem correspondente à pessoa usuária.
@@ -2976,6 +3003,7 @@ No arquivo "nova-transacao-component.ts", vamos colocar o código dentro de um b
 
 Assim, tentará executar o que consta no código do bloco try e, ao final, se acontecer algum problema, criaremos o bloco catch para capturar o erro gerado e exibir a mensagem.
 
+```JavaScript
 elementoFormulario.addEventListener("submit", function(event) {
     try 
     {
@@ -3008,7 +3036,8 @@ elementoFormulario.addEventListener("submit", function(event) {
         alert(erro.message);
     }
 });
-Copiar código
+```
+
 Agora, qualquer erro que acontecer será capturado pelo bloco try e transferio para o bloco catch que fará o tratamento, no caso, exibir o alerta.
 
 De volta ao navegador, vamos tentar novamente fazer a transação inválida de transferência no valor de R$ 5.000,00. Ao concluí-la, recebemos a mensagem de que o saldo é insuficiente.
@@ -3017,21 +3046,816 @@ Com isso, temos um tratamento mais sofisticado para os erros da nossa aplicaçã
 
 Agora, vamos refazer o procedimento de editar o HTML da página e incluir a opção de saque para ver o comportamento da opção inválida:
 
+```html
 <select name="tipoTransacao" id="tipoTransacao" class="campo-input" required> == $0
     <option value>Selecione o tipo de transação</option> 
     <option value="Depósito">Depósito</option>
     <option value="Transferência">Transferência</option>
     <option value="Pagamento de Boleto">Pagamento de Boleto</option>
     <option value="Saque">Saque</option>
-Copiar código
+```
+
 Ao fazê-lo e tentar utilizar esta opção de saque no valor de R$ 5.000,00, recebemos a mensagem de que a transação é inválida e o formulário não é mais limpo. Com isso, temos certeza que a aplicação está parando de executar na linha de código em questão e não seguindo para as próximas linhas.
 
 Fechamos o tratamento de erros e podemos seguir para o próximo desafio!
 
-### Aula 5 -  - Vídeo 2
-### Aula 5 -  - Vídeo 3
-### Aula 5 -  - Vídeo 4
-### Aula 5 -  - Vídeo 5
-### Aula 5 -  - Vídeo 6
-### Aula 5 -  - Vídeo 7
-### Aula 5 -  - Vídeo 8
+### Aula 5 - Mantendo o registro das transações - Vídeo 2
+
+Transcrição  
+Apesar de nossa lista estar funcionando no navegador, ela está somente em memória. Sendo assim, sempre que recarregarmos a página ou reiniciarmos a aplicação, perderemos os dados e teremos que inserir novamente. O ideal, porém, é que esses dados sejam mantidos e salvos, mantendo não apenas o registro de transações, mas também o saldo.
+
+Para fazer esse registro permanente, vamos utilizar um recurso do navegador chamado "Local Storage". Dentro das ferramentas de desenvolvedor, na aba "Application", temos "Storage" na lateral esquerda com as opções "Local Storage" e "Session Storage". A primeira é basicamente um registro permanente de dados, enquanto a segunda é um registro temporário, perdido sempre que fechamos o browser. Como queremos guardar as informações da lista de transação e do saldo, usaremos o Local Storage.
+
+No arquivo "Conta.ts", ao invés de simplesmente iniciarmos o código com um array vazio, vamos puxar as informações que existirem no Local Storage. Porém, para armazenar informações neste local, precisamos transformá-las em texto, que será um objeto com os dados. A melhor forma de guardar a estrutura deste objeto é utilizando a conversão em JSON, assim conseguimos não só armazená-los em texto, como também trazê-los de volta quando necessário.
+
+Em const transacoes colocaremos localStorage.getItem para obter um dado que identificaremos como "transacoes":
+
+```JavaScript
+const transacoes: Transacao[] = localStorage.getItem("transacoes")
+```
+
+O dado será sempre retornado em texto, então precisamos transformá-lo de volta para uma lista de transações. Como vamos guardar as informações em JSON, ao retorná-las faremos um parse para que sejam um valor válido e reconhecível para o Java Script.
+
+```JavaScript
+const transacoes: Transacao[] = JSON.parse( localStorage.getItem("transacoes"))
+```
+
+Se não existir o item de transações, deve ser retornado nulo. Neste caso, será atribuído um array vazio. Ou seja, se houver dados no Local Storage, eles serão trazidos, transformados pelo parse e colocados na constante transacoes. Caso contrário, é iniciado um array vazio.
+
+```JavaScript
+const transacoes: Transacao[] = JSON.parse( localStorage.getItem("transacoes")) || [];
+```
+
+A cada vez que uma transação for feita (transacoes.push(novaTransacao)), precisamos atualizar o Local Storage. Portanto, após console.log(transacoes), colocaremos localStorage.setIrem("transacoes", transacoes).
+
+```JavaScript
+console.log(transacoes);
+localStorage.setIrem("transacoes", transacoes);
+```
+
+Precisamos transformar transacoes em uma string do tipo JSON, então a passaremos para JSON.stringfy():
+
+```JavaScript
+console.log(transacoes)
+localStorage.setIrem("transacoes", JSON.stringfy(transacoes));
+```
+
+Dessa forma, a lista será transformada em uma string JSON válida, guardada no Local Storage e quando atualizarmos a página, os dados serão retornados para transacoes.
+
+Mas temos um problema: um dos dados que temos na lista é do tipo data. Sendo assim, também precisamos pegá-lo e transformá-lo novamente uma data válida ao carregar a página. Para isso, em JSON.parse(), passaremos uma arrow function para pegar a key e o value de cada propriedade do objeto da lista de transações. Ambos serão do tipo string.
+
+```JavaScript
+const transacoes: Transacao[] = JSON.parse(localStorage.getItem("transacoes"), (key: string, value: string) => { 
+
+}) || [];
+```
+
+Em seguida, faremos uma condicional em que se a key for do tipo 'data' (propriedade que armazena o tipo date), o valor deve ser tratado como data. Sendo assim, vamos retornar new Date() com o valor (value). Ou seja, a data que foi convertida em uma string é retornada novamente como um objeto de data.
+
+```JavaScript
+const transacoes: Transacao[] = JSON.parse(localStorage.getItem("transacoes"), (key: string, value: string) => { 
+    if (key === "data") {
+        return new Date(value);
+    }
+
+}) || [];
+```
+
+Se for outro tipo de dado, queremos que ele simplesmente seja retornado, por isso incluíremos return value:
+
+```JavaScript
+const transacoes: Transacao[] = JSON.parse(localStorage.getItem("transacoes"), (key: string, value: string) => { 
+    if (key === "data") {
+        return new Date(value);
+    }
+
+    return value;
+}) || [];
+```
+
+Feito o tratamento, vamos voltar ao navegador e atualizar a página. Em seguida, faremos uma transação de depósito no valor de R$ 500,00. Ao concluí-la, vamos verificar a aba "Application" e clicar em "Local Storage", na aba lateral. Observe que a transação deve aparecer.
+
+Agora, ao atualizar o navegador e fazer uma nova operação, os dados que estão no "Local Storage" são mantidos e os dados da nova transação também aparecem.
+
+Se fecharmos o browser e abrirmos novamente, o histórico de transações será mantido. Com isso, podemos fazer várias operações sem perder o histórico do que já foi feito.
+
+Nos resta salvar os dados de saldo e partir para a construção do componente de extrato. Vamos lá?
+
+### Aula 5 - Agrupamento de transações por data - Vídeo 3
+
+Transcrição  
+Vamos salvar nosso saldo no Local Storage assim como fizemos com a lista de transações. Mas, antes de partir para o componente de extrato, precisaremos fazer um agrupamento. Isso, porque, se observarmos o extrato, as transações realizadas são agrupadas por mês, então faremos um agrupamento de mês e ano. Em seguida, vamos ordenar da data mais recente para a mais antiga.
+
+No arquivo "Conta.ts", no saldo, ao invés de guardar um número qualquer, vamos puxar do Local Storage e chamálo de "saldo":
+
+```JavaScript
+let saldo: number = localStorage.getItem("saldo");
+```
+
+Como os dados são guardados em string, precisamos fazer um JSON.parse(). Como valor padrão, colocaremos "0".
+
+```JavaScript
+let saldo: number = JSON.parse(localStorage.getItem("saldo")) || 0;
+```
+
+Dessa forma, se não houver nada guardado será atribuído o valor 0 à variável "saldo".
+
+Agora, sempre que for feita uma operação com o saldo, ele precisará ser atualizado no Local Storage. Sendo assim, na função debitar(), após saldo -= valor, colocaremos localStorage.setItem("saldo", saldo).
+
+```JavaScript
+function debitar(valor: number): void {
+    if (valor <= 0) {
+        throw new Error("O valor a ser debitado deve ser maior que zero!");
+    }
+    if (valor > saldo) {
+        throw new Error("Saldo insuficiente!");
+    }
+
+    saldo -= valor;
+    localStorage.setItem("saldo", saldo);
+}
+```
+
+É esperado um valor de string, mas saldo é um valor numérico, então colocaremos .toString() para transformá-lo.
+
+```JavaScript
+function debitar(valor: number): void {
+    if (valor <= 0) {
+        throw new Error("O valor a ser debitado deve ser maior que zero!");
+    }
+    if (valor > saldo) {
+        throw new Error("Saldo insuficiente!");
+    }
+
+    saldo -= valor;
+    localStorage.setItem("saldo", saldo.toString());
+}
+```
+
+Repetiremos o mesmo processo para a função depositar():
+
+```JavaScript
+function depositar(valor: number): void {
+    if (valor <= 0) {
+        throw new Error("O valor a ser depositado deve ser maior que zero!");
+    }
+
+    saldo += valor;
+    localStorage.setItem("saldo", saldo.toString());
+}
+```
+
+Agora, estamos mantendo o valor salvo. Vamos voltar ao navegador e atualizar.
+
+Perceba que o valor de saldo inicia como 0, já que não há nada armazenado. Mas se fizermos um depósito no valor de R$ 5.000,00 o saldo muda para este valor e se mantém mesmo ao atualizar a página, já que o dado está sendo puxado do Local Storage.
+
+Ao teclar "F12", vamos na aba "Application" e clicamos em "Local Storage", na lateral esquerda. Perceba que há dois dados sendo armazenados: transações e saldo.
+
+Agora, vamos organizar a estrutura do nosso extrato. Temos uma lista de transações e precisamos agrupá-las por data. Então precisamos criar um objeto que faça este agrupamento.
+
+Na pasta "types", criaremos um arquivo chamado "GrupoTransacao.ts", que representará a estrutura deste grupo. Nele, vamos exportar um novo tipo chamado "GrupoTransacao" cuja estrutura terá um rótulo em string (label: string) e uma lista de transações deste grupo (transacoes: Transacao[]). Ou seja, se temos um grupo de rótulo Setembro/2023, precisamos que nele estejam todas as transações do mês de setembro do ano de 2023.
+
+```JavaScript
+export type GrupoTransacao = {
+    label: string;
+    transacoes: Transacao[];
+}
+```
+
+Ao passar a lista Transacao[], é possível que a importação tenha sido feita automaticamente. Se isso não ocorrer, basta colocarmos o comando de importação no início do código, lembrando de incluir a extensão .js:
+
+```JavaScript
+import { Transacao } from "./Transacao.js";
+
+export type GrupoTransacao = {
+    label: string;
+    transacoes: Transacao[];
+}
+```
+
+Agora, voltemos ao arquivo "Conta.ts" para criar um método para fazer o agrupamento e o retornar.
+
+Dentro do objeto Conta, após getDataAcesso(), criaremos um método chamado getGruposTransacoes() que vai nos retornar um array GrupoTransacao[]:
+
+```JavaScript
+const Conta = {
+    getSaldo() {
+        return saldo;
+    },
+
+    getDataAcesso(): Date {
+        return new Date();
+    },
+
+    getGruposTransacoes(): GrupoTransacao[] {
+        
+        }
+```
+
+Neste momento, é importante conferir se a importação de GrupoTransacao foi feita corretamente no início do código. Este é o comando utilizado:
+
+```JavaScript
+import { GrupoTransacao } from "./GrupoTransacao.js";
+```
+
+Agora, dentro do método, criaremos uma lista de grupos de transações que será um array GrupoTransacao[] que iniciará vazio:
+
+```JavaScript
+getGruposTransacoes(): GrupoTransacao[] {
+        const gruposTransacoes: GrupoTransacao[] = [];
+```
+
+Em seguida, pegamos a lista de transações que receberá a constante transacoes:
+
+```JavaScript
+getGruposTransacoes(): GrupoTransacao[] {
+        const gruposTransacoes: GrupoTransacao[] = [];
+        const listaTransacoes: Transacao[] = transacoes;
+```
+
+Um array é um objeto, então ao fazer essa atribuição temos a referência desse objeto. Portanto, não estamos criando uma cópia de transações e colocando na constante listaTransacoes, mas sim pegando a referência do mesmo objeto em memória e colocando nela. Isso é um pouco perigoso porque não devemos expor nossa lista de transações para uso fora de Conta, pois ao fazer isso possibilitamos que um código externo faça manipulações nesta lista.
+
+O que queremos, porém, é centralizar toda a manipulação da lista de transações em Conta, de forma que só ela possa realmente modificar a lista. Ainda assim, precisamos expor o conteúdo da lista, pois um componente externo precisará dela. Sendo assim, fazemos uma cópia da lista e a retornamos para que seja usada fora. Assim, se houver alguma modificação na cópia, a lista original não será afetada, o que nos garante um nível a mais de segurança.
+
+Logo, ao invés de simplesmente passarmos a referência da lista de transações, faremos uma cópia da lista utilizando structuredClone(). Este é um novo comando do Java Script, adicionado como uma função global, que faz um clone de toda a estrutura do objeto e gera uma nova referência para o objeto.
+
+```JavaScript
+getGruposTransacoes(): GrupoTransacao[] {
+        const gruposTransacoes: GrupoTransacao[] = [];
+        const listaTransacoes: Transacao[] = structuredClone(transacoes);
+```
+
+Agora, precisamos ordenar essas transações, então criaremos uma constante transacoesOrdenadas que será uma lista de Transacao[]. Porém, aplicaremos um .sort(), pegando t1 e t2 e aplicando uma comparação com .getTime().
+
+```JavaScript
+getGruposTransacoes(): GrupoTransacao[] {
+        const gruposTransacoes: GrupoTransacao[] = [];
+        const listaTransacoes: Transacao[] = structuredClone(transacoes);
+                const transacoesOrdenadas: Transacao[] = listaTransacoes.sort((t1, t2) => t2.data.getTime() - t1.data.getTime());
+```
+
+O getTime() retorna um número que representa a nossa data. Então, estamos pegando as datas das transferências 1 e 2 (t1 e t2) e comparando. Ao colocar a data 2 antes da data 1, no comparativo, fazemos uma ordenação da data mais recente para a mais antiga. Se trocássemos a posição, a ordenação seria crescente.
+
+Deixaremos uma atividade de "Para saber mais" para que você entenda melhor o funcionamento do sort!
+
+Em seguida, criaremos uma variável labelAtualGrupoTransacao, que será uma string responsável por representar o nome do grupo.
+
+```JavaScript
+getGruposTransacoes(): GrupoTransacao[] {
+        const gruposTransacoes: GrupoTransacao[] = [];
+        const listaTransacoes: Transacao[] = structuredClone(transacoes);
+                const transacoesOrdenadas: Transacao[] = listaTransacoes.sort((t1, t2) => t2.data.getTime() - t1.data.getTime());
+                let labelAtualGrupoTransacao: string = "";
+```
+
+Depois, vamos percorrer a lista de transação, pegando o label gerado. Com toLocaleDateString() pegaremos o nome e ano do mês:
+
+```JavaScript
+getGruposTransacoes(): GrupoTransacao[] {
+        const gruposTransacoes: GrupoTransacao[] = [];
+        const listaTransacoes: Transacao[] = structuredClone(transacoes);
+                const transacoesOrdenadas: Transacao[] = listaTransacoes.sort((t1, t2) => t2.data.getTime() - t1.data.getTime());
+                let labelAtualGrupoTransacao: string = "";
+                
+                for (let transacao of transacoesOrdenadas) {
+            let labelGrupoTransacao: string = transacao.data.toLocaleDateString("pt-br", { month: "long", year: "numeric" });
+                        }
+                }
+```
+
+Ou seja, estamos pegando a data da transação atual e solicitando o nome do mês e ano desta transação.
+
+Agora, faremos uma condicional de comparação em que se labelAtualGrupoTransacao for diferente de labelGrupoTransacao, criaremos um grupo e atribuiremos esse label a ele.
+
+```JavaScript
+getGruposTransacoes(): GrupoTransacao[] {
+        const gruposTransacoes: GrupoTransacao[] = [];
+        const listaTransacoes: Transacao[] = structuredClone(transacoes);
+                const transacoesOrdenadas: Transacao[] = listaTransacoes.sort((t1, t2) => t2.data.getTime() - t1.data.getTime());
+                let labelAtualGrupoTransacao: string = "";
+                
+                for (let transacao of transacoesOrdenadas) {
+            let labelGrupoTransacao: string = transacao.data.toLocaleDateString("pt-br", { month: "long", year: "numeric" });
+                        if (labelAtualGrupoTransacao !== labelGrupoTransacao) {}
+```
+
+Logo, labelAtualGrupoTransacao será igual a labelGrupoTransacao. Em grupoTransacoes, daremos um .push() de um novo grupo, cujo label será labelGrupoTransacao e transacoes será iniciado como um array vazio.
+
+```JavaScript
+getGruposTransacoes(): GrupoTransacao[] {
+        const gruposTransacoes: GrupoTransacao[] = [];
+        const listaTransacoes: Transacao[] = structuredClone(transacoes);
+                const transacoesOrdenadas: Transacao[] = listaTransacoes.sort((t1, t2) => t2.data.getTime() - t1.data.getTime());
+                let labelAtualGrupoTransacao: string = "";
+                
+                for (let transacao of transacoesOrdenadas) {
+            let labelGrupoTransacao: string = transacao.data.toLocaleDateString("pt-br", { month: "long", year: "numeric" });
+                        if (labelAtualGrupoTransacao !== labelGrupoTransacao) {
+                labelAtualGrupoTransacao = labelGrupoTransacao;
+                gruposTransacoes.push({
+                    label: labelGrupoTransacao,
+                    transacoes: []
+                });
+            }
+```
+
+Dessa forma, estamos comparando o label do grupo atual com o label capturado da transação para saber se é necessário gerar um novo grupo com esta nova transação ou se ela pertence a um grupo já criado.
+
+Se temos Setembro de 2023, por exemplo, criamos este grupo e iniciamos sua lista de transações. Na próxima transação, pegaremos a data para verificar se ela pertence a um grupo já existente ou se precisaremos criar um novo grupo com essa data. Se vier, novamente, uma data de Setembro de 2023, a colocaremos no grupo já existente; caso contrário, criamos um grupo.
+
+Após a condicional, pegaremos a última posição de gruposTransacoes para pegar o array de transações e colocar a transação em questão dentro dele:
+
+```JavaScript
+getGruposTransacoes(): GrupoTransacao[] {
+        const gruposTransacoes: GrupoTransacao[] = [];
+        const listaTransacoes: Transacao[] = structuredClone(transacoes);
+        const transacoesOrdenadas: Transacao[] = listaTransacoes.sort((t1, t2) => t2.data.getTime() - t1.data.getTime());
+        let labelAtualGrupoTransacao: string = "";
+
+        for (let transacao of transacoesOrdenadas) {
+            let labelGrupoTransacao: string = transacao.data.toLocaleDateString("pt-br", { month: "long", year: "numeric" });
+            if (labelAtualGrupoTransacao !== labelGrupoTransacao) {
+                labelAtualGrupoTransacao = labelGrupoTransacao;
+                gruposTransacoes.push({
+                    label: labelGrupoTransacao,
+                    transacoes: []
+                });
+            }
+            gruposTransacoes.at(-1).transacoes.push(transacao);
+        }
+            },
+```
+
+Os grupos são adicionados sempre no final da lista. Então, ao adicionar um novo grupo, sempre vamos ao último grupo da lista e adicionamos a nova transação à lista de transações deste grupo.
+
+Ou seja, se criamos o grupo Setembro de 2023, vamos até ele, que é o último grupo da lista de grupos, e adicionamos a nova transação. Depois, criamos o novo grupo Abril de 2023, por exemplo, e ele passará a estar na última posição do array, então é nele que adicionaremos a nova transação pertencente a Abril de 2023.
+
+Para finalizar, fora do for, retornamos gruposTransacoes.
+
+```JavaScript
+ getGruposTransacoes(): GrupoTransacao[] {
+        const gruposTransacoes: GrupoTransacao[] = [];
+        const listaTransacoes: Transacao[] = structuredClone(transacoes);
+        const transacoesOrdenadas: Transacao[] = listaTransacoes.sort((t1, t2) => t2.data.getTime() - t1.data.getTime());
+        let labelAtualGrupoTransacao: string = "";
+
+        for (let transacao of transacoesOrdenadas) {
+            let labelGrupoTransacao: string = transacao.data.toLocaleDateString("pt-br", { month: "long", year: "numeric" });
+            if (labelAtualGrupoTransacao !== labelGrupoTransacao) {
+                labelAtualGrupoTransacao = labelGrupoTransacao;
+                gruposTransacoes.push({
+                    label: labelGrupoTransacao,
+                    transacoes: []
+                });
+            }
+            gruposTransacoes.at(-1).transacoes.push(transacao);
+        }
+
+        return gruposTransacoes;
+    },
+```
+
+Em registrarTransacao(), ao invés de exibir as transações em si com console.log(transacoes), passaremos a exibir todos os grupos de transações com console.log(this.getGruposTransacoes()).
+
+```JavaScript
+transacoes.push(novaTransacao);
+        console.log(this.getGruposTransacoes());
+        localStorage.setItem("transacoes", JSON.stringify(transacoes));
+```
+
+De volta ao navegador, vamos abrir o console e fazer um depósito de R$ 500,00 na data 12/04/2023. Ao concluir, é criado um grupo para esta transação - isso considerando que ainda não tínhamos feito nenhuma transação com este mês.
+
+No total, temos 3 grupos: maio de 2023, abril de 2023 e fevereiro de 2023. Isso, claro, considerando as transações de exemplo feitas anteriormente pelo instrutor.
+
+Se criarmos uma nova transação com data 20/04/2023, o grupo de abril de 2023 é mantido e esta transação é adicionada a ele. Ou seja, as transações realizadas estão sendo agrupadas corretamente!
+
+A seguir, veremos como exibir esses grupos no extrato. Vamos lá?
+
+### Aula 5 - Criando o componente de extrato - Vídeo 4
+
+Transcrição  
+O que falta é criarmos o componente de extrato que exibirá todos os agrupamentos que fizemos na tela de extrato da pessoa usuária. Para isso, clicaremos na pasta "components" com o botão direito, selecionaremos "New File".
+
+Nomearemos o novo arquivo como extrato-component.ts, seguindo o padrão de nomeação. Em seguida, abriremos o arquivo main.ts para importá-lo abaixo do saldo-component.js, porque ele irá interagir com a DOM.
+
+```JavaScript
+import "./components/nova-transacao-component.js";
+import "./components/saldo-component.js";
+import "./components/extrato-component.js";
+```
+
+Abriremos o arquivo index.html para revisarmos como é a estrutura das nossas transações. Na linha 74 temos o `<aside class="extrato">` e, dentro dele, temos uma div com todos os grupos de transações feitos. Cada grupo é representado pela classe transacoes-group, onde temos o mes-group, transacao-item e mais informações de cada item de transação.
+
+Portanto, toda vez que criarmos um grupo, usaremos a estrutura da `<div class="transacoes-group>`, adicionando os itens de cada transação dentro dele. Sabendo disso, vamos retornar para o arquivo extrato-component.ts.
+
+Inclusive, podemos fechar outros arquivos que não vamos precisar agora, deixando apenas o Conta.ts, que iremos precisar. Feito isso, na primeira linha do extrato-component.ts escreveremos:
+
+```JavaScript
+const elementoRegistroTransacoesExtrato: HTMLElement = document.querySelector(".extrato .registro-transacoes");
+```
+
+Então criamos o elementoRegistroTransacoesExtrato, que é um HTML Element. Através do querySelector(), acessamos o elemento .extrato, que é o nosso aside, e procurar pelo registro-transacoes. Essa será a div onde colocaremos todos os grupos. Nosso próximo passo é criar uma função que irá renderizar a estrutura do extrato:
+
+```JavaScript
+import Conta from "../types/Conta.js";
+
+const elementoRegistroTransacoesExtrato: HTMLElement = document.querySelector(".extrato .registro-transacoes");
+
+function renderizarExtrato(): void {
+    const gruposTransacoes: GrupoTransacao[] = Conta.getGruposTransacoes();
+}
+```
+
+Então criamos a função renderizarExtrato, seguindo o mesmo padrão que usamos no saldo, que é uma void. Dentro dela, precisamos de todos os grupos e transações que estão no objeto Conta. Então criamos a variável gruposTransacoes para guardar essas informações, que são uma array. Por fim, passamos o Conta.getGruposTransacoes(), fazendo automaticamente a importação de Conta.
+
+Toda vez que renderizarmos o extrato, precisamos limpar toda a nossa interface de extrato para renderizar a lista atualizada. Para isso, a primeira coisa que fazermos e limpar todo o innerHTML, que é o conteúdo HTML, do elementoRegistroTransacoesExtrato, codando elementoRegistroTransacoesExtrato.innerHTML = ""; para limpar todo o elemento e reconstruirmos a estrutura.
+
+Primeiramente construímos toda a estrutura HTML desse elemento em memória. Para isso, criamos uma variável chamada htmlRegistroTransacoes, que será uma string e, a princípio estará vazia: let htmlRegistroTransacoes: string = "".
+
+```JavaScript
+import Conta from "../types/Conta.js";
+
+const elementoRegistroTransacoesExtrato: HTMLElement = document.querySelector(".extrato .registro-transacoes");
+
+function renderizarExtrato(): void {
+    const gruposTransacoes: GrupoTransacao[] = Conta.getGruposTransacoes();
+    elementoRegistroTransacoesExtrato.innerHTML = "";
+    let htmlRegistroTransacoes: string = "";
+}
+```
+
+Em seguida, percorreremos todos esses grupos para conseguirmos gerar os grupos e seus itens. Para isso, usaremos uma estrutura for() para o grupoTransacoes, passando a estrutura do htmlTransacaoItem:
+
+```JavaScript
+//código omitido
+
+for (let grupoTransacoes of grupoTransacoes)
+{
+    let htmlTransacaoItem: string = "";
+    for (let transacao of grupoTransacao.transacoes)
+    {
+        htmlTransacaoItem += `
+            <div class="transacao-item">
+                <div class="transacao-info">
+                    <span class="tipo">Transferência</span>
+                    <strong class="valor">-R$ 36,00</strong>
+            </div>
+            <time class="data">04/09</time>
+        </div>
+        `;
+    }
+}
+```
+
+Então, dentro do looping, criamos outro for() que passa por cada transação da lista de transações do grupo (transacao of grupoTransacao.transacoes), criando um item. Esse item é o htmlTransacaoItem concatenado com toda a estrutura HTML de um item.
+
+Para isso, copiamos uma div class="transacao-item">, do index.html, e colamos dentro das crases no nosso exemplo, representando um item da nossa transação. Feito isso, substituiremos algumas informações pelos dados necessários.
+
+Na tag span, mudaremos de Transferência pelo tipo de transação, com a interpolação ${transacao.tipoTransacao}. Na tag strong, apagaremos o r$ 36,00 e passaremos o valor formatado em moeda, com a interpolação ${formatarMoeda(transacao.valor)}.
+
+Por fim, na tag time, precisamos passar a data formatada no lugar de 04/09, com a interpolação ${formatarData(transacao.data, FormatoData.DIA_MES)}. E precisamos lembrar de importar as funções formatarMoeda() e formatarData() no começo do código:
+
+```JavaScript
+import Conta from "../types/Conta.js";
+import { GrupoTransacao } from "../types/GrupoTransacao.js";
+import { formatarMoeda, formatarData } from "../utils/formatters.js";
+
+//código omitido
+
+    for (let grupoTransacoes of grupoTransacoes)
+    {
+        let htmlTransacaoItem: string = "";
+        for (let transacao of grupoTransacao.transacoes)
+        {
+            htmlTransacaoItem += `
+                <div class="transacao-item">
+                    <div class="transacao-info">
+                        <span class="tipo">${transacao.tipo}</span>
+                        <strong class="valor">${formatarMoeda(transacao.valor)}</strong>
+                </div>
+                <time class="data">${formatarData(transacao.data, FormatoData.DIA_MES)}</time>
+            </div>
+            `;
+        }
+    }
+```
+
+Então ele vai construir todos os itens desse grupo e os concatenar novamente na variável htmlTransacaoItem. Agora precisamos criar o grupo e adicionar toda essa estrutura nesse grupo. Sendo assim, após o looping for(let transacao of grupoTransacao.transacoes), codaremos o htmlRegistroTransacoes que será concatenado (+=) com um grupo: o <div class="transacoes-group">.
+
+```JavaScript
+//código omitido
+htmlRegistroTransacoes += `
+    <div class="transacoes-group">
+        <strong class="mes-group">${grupoTransacao.label}</strong>
+        ${htmlTransacao}
+    </div>
+`;
+```
+
+Então na div do grupo temos um strong que identifica o mês do grupo, com a classe mes-group, para o qual passamos o label do grupo, com ${grupoTransacao.label}. Depois, passamos todo o HTML de cada item de transação, com o ${htmlTransacao}.
+
+Portanto, primeiramente vamos identificar o grupo e obter todos os itens que ele tem. Depois adicionamos esse conteúdo à variável htmlTransacoesItem. Por fim, no htmlRegistroTransacoes, criamos um grupo correspondente para o qual passamos todos esses itens.
+
+Agora, fora do for( let grupoTransacao of gruposTransacoes), precisamos adicionar toda essa estrutura dentro do elemento. Para isso, codaremos elementoRegistroTransacoesExtrato.innerHTML = htmlRegistroTransacoes;
+
+```JavaScript
+import Conta from "../types/Conta.js";
+import { FormatoData } from "../types/FormatoData";
+import { GrupoTransacao } from "../types/GrupoTransacao.js";
+import { formatarMoeda, formatarData } from "../utils/formatters.js";
+
+const elementoRegistroTransacoesExtrato: HTMLElement = document.querySelector(".extrato .registro-transacoes");
+
+function renderizarExtrato(): void {
+    const gruposTransacoes: GrupoTransacao[] = Conta.getGruposTransacoes();
+    elementoRegistroTransacoesExtrato.innerHTML = "";
+    let htmlRegistroTransacoes: string = "";
+}
+
+    for (let grupoTransacoes of grupoTransacoes)
+    {
+        let htmlTransacaoItem: string = "";
+        for (let transacao of grupoTransacao.transacoes)
+        {
+            htmlTransacaoItem += `
+                <div class="transacao-item">
+                    <div class="transacao-info">
+                        <span class="tipo">${transacao.tipo}</span>
+                        <strong class="valor">${formatarMoeda(transacao.valor)}</strong>
+                </div>
+                <time class="data">${formatarData(transacao.data, FormatoData.DIA_MES)}</time>
+            </div>
+            `;
+        }
+        htmlRegistroTransacoes += `
+            <div class="transacoes-group">
+                <strong class="mes-group">${grupoTransacao.label}</strong>
+                ${htmlTransacao}
+            </div>
+        `;
+    }
+    elementoRegistroTransacoesExtrato.innerHTML = htmlRegistroTransacoes;
+}
+```
+
+Pode ser que, ao reiniciarmos a aplicação por inteiro, não tenhamos registros guardados no nosso extrato. Portanto, fora do for(), mas antes do elementoRegistroTransacoesExtrato, precisamos criar uma condicional if() para verificar esse caso.
+
+```JavaScript
+//código omitido
+if (htmlRegistroTransacoes === "") {
+    htmlRegistroTransacoes = "<div>Não há transações registradas.</div>";
+}
+
+elementoRegistroTransacoesExtrato.innerHTML = htmlRegistroTransacoes;
+```
+
+Portanto, se o htmlRegistroTransacoes for vazio, ou seja, não tiver nenhum registro guardado no extrato, exibiremos como resultado uma div com a mensagem "Não há transações registradas". Se não fizermos isso, apareceria apenas uma tela fazia sem explicar nada para pessoa usuária.
+
+Logo que iniciarmos a aplicação, precisamos mostrar o extrato. Sendo assim, após criarmos a const elementoRegistroTransacoesExtrato, chamaremos a função renderizaExtrato().
+
+```JavaScript
+const elementoRegistroTransacoesExtrato: HTMLElement = document.querySelector(".extrato .registro-transacoes");
+
+renderizaExtrato();
+function renderizarExtrato(): void {
+  const gruposTransacoes: GrupoTransacao[] = Conta.getGruposTransacoes();
+  elementoRegistroTransacoesExtrato.innerHTML = "";
+  let htmlRegistroTransacoes: string = "";
+}
+
+//código omitido
+```
+
+Retornando ao navegador e atualizando a página do Bytebank, notamos que houve um erro no carregamento do{ FormatoData }. Ao conferirmos a importação, está faltando o .js no final, então precisamos corrigir para import { FormatoData } from "../types/FormatoData.js";.
+
+Ao voltarmos para o navegador, percebemos que o erro desapareceu e o extrato foi atualizado e agrupado corretamente. Então a exibição de todas as transações realizadas nos grupos correspondentes funcionou como esperado.
+
+Faltam apenas alguns ajustes para concluirmos nossa aplicação e os faremos a seguir.
+
+### Aula 5 - Salvando dados no localStorage - Exercício
+
+Angela é uma desenvolvedora web e foi contratada pela Bytebank Banco Digital para aprimorar o sistema de transação bancária. Ela está estudando o código de base do sistema para entender como as informações sobre saldo e transações estão sendo salvas no front-end. O código base usado no sistema é o seguinte:
+
+```JavaScript
+let saldo: number = JSON.parse(localStorage.getItem("saldo")) || 0;
+const transacoes: Transacao[] = JSON.parse(localStorage.getItem("transacoes"), (key: string, value: string) => {
+    if (key === "data") {
+        return new Date(value);
+    }
+
+    return value;
+}) || [];
+```
+
+Angela percebe que o código usa a função JSON.parse() e o localStorage para obter e armazenar informações sobre saldo e transações. Com base no seu conhecimento sobre o conteúdo do curso "TypeScript na Prática: Implemente um projeto completo com TypeScript e módulos" e no tema "Bytebank Banco Digital (Banco)", qual a melhor explicação para o uso dessas funções no código?
+
+Selecione uma alternativa
+
+A função JSON.parse() é utilizada para converter o saldo e as transações armazenadas no localStorage em objetos JavaScript, enquanto o localStorage é usado para armazenar persistentemente essas informações no navegador do usuário.
+
+> Essa alternativa é correta porque a função JSON.parse() é de fato utilizada para converter informações armazenadas no formato JSON em objetos JavaScript, e o localStorage é utilizado para armazenar as informações de forma persistente no navegador do usuário.
+
+### Aula 5 - Ajustes finais - Vídeo 5
+
+Transcrição  
+Para finalizarmos nosso componente de extrato, faltam três alterações. A primeira delas é que precisamos atualizar o extrato sempre que fizemos uma nova transação, algo que não acontece agora.
+
+Se acessarmos o site da Bytebank e fizermos um depósito, somente o saldo é atualizado. O extrato só atualiza quando atualizamos a página, porque ele faz uma nova busca e acrescente essa informação.
+
+A segunda alteração é que, sempre que fizermos uma transferência ou pagamento de boleto, precisamos mostrar o valor no extrato antecedido pelo sinal de subtração (-), indicando que esse valor foi retirado do saldo. Então quando um valor entrar, ele aparecerá positivo no extrato, mas quando um valor sair, ele aparecerá como negativo.
+
+Por fim, precisamos nos atentar que as datas das transações estão com um dia a menos. Esse problema é um comportamento inevitável do JavaScript quando se trata de data, e precisamos arrumá-lo no nosso código passando uma informação a mais.
+
+Com a página do Bytebank aberta, pressionaremos "F12" para abrirmos o Console do navegador. Entre as abas na barra superior, clicaremos em "Application" (Aplicação). Nessa aba, selecionaremos a linha transacoes, que está na coluna "Key" (Chave) para reiniciarmos nosso histórico.
+
+Ao atualizarmos a página do Bytebank, pressionando "F5", na coluna de "Extrato" aparece apenas a mensagem "Não há transações registradas", porque apagamos todo o histórico. Agora retornaremos ao nosso código para aplicarmos as correções.
+
+Atualizando o extrato a cada transação  
+Para que nosso extrato seja atualizado a cada nova transação, precisaremos criar algo para renderizar a estrutura do componente de extrato novamente. Portanto, faremos algo parecido com o que fizemos no saldo.
+
+Na última linha do arquivo extrato-component.ts, criaremos o objeto const ExtratoComponent que representará o componente para uso externo. Nele criaremos um método chamado atualizar() que chama o renderizarExtrato(). Por fim, expomos esse objeto codando export default ExtratoComponent; na última linha.
+
+```JavaScript
+//código omitido
+
+const ExtratoComponent = {
+    atualizar(): void {
+        renderizarExtrato( );
+    }
+}
+
+export default ExtratoComponent;
+```
+
+Feito isso, abriremos o arquivo nova-transacao-component.ts. Assim como chamamos o SaldoComponent.atualizar() na linha 31, para atualizar o saldo a cada nova transação, abaixo dessa linha chamaremos o ExtratoComponent.atualizar() para atualizarmos o extrato a cada nova transação.
+
+```JavaScript
+//código omitido
+
+Conta.registrarTransacao(novaTransacao);
+SaldoComponent.atualizar();
+ExtratoComponent.atualizar();
+elementoFormulario.reset();
+
+//código omitido
+```
+
+Corrigindo a data  
+Aproveitando que estamos no arquivo nova-transacao-component.ts, no nosso try, toda vez que passamos um novo valor, geramos uma data que vem do inputData. Precisamos adicionar um horário a essa informação, no caso, adicionaremos " 00:00:00". Com essa informação o JavaScript já entende que é a data correta.
+
+```JavaScript
+//código omitido
+
+let tipoTransacao: TipoTransacao = inputTipoTransacao.value as TipoTransacao;
+let valor: number inputValor.valueAsNumber;
+let data: Date = new Date(inputData.value + " 00:00:00");
+
+//código omitido
+```
+
+Se não passamos o horário como zero horas ou algum outro valor de horário, indicando que é aquela data a partir do horário determinado, ele sempre considera como um dia a menos. Eu vou deixar um "Para Saber Mais" para vocês entenderem melhor esse problema da data, porque precisamos tomar cuidado com ele.
+
+Indicando valores de saída da conta  
+Corrigindo esses dois pontos, sempre que fizermos uma nova transação, ela será registrada no extrato com a data correta. Falta apenas adicionarmos o sinal de menos aos valores de transferência e pagamento de boleto. Para isso, acessaremos o arquivo Conta.ts.
+
+Sempre que debitarmos um valor da conta, atualizamos o saldo com a função debitar(), que chamamos da registrarTransacao(). Ao chamarmos essa função, faremos que o valor do objeto novaTransacao fique negativo, multiplicando-o por -1. Assim, ao registrá-lo nos agrupamentos de transação, ele vai aparecer como um valor negativo.
+
+```JavaScript
+//código omitido
+
+registrarTransacao(novaTransacao: Transacao): void {
+        if (novaTransacao.tipoTransacao == TipoTransacao.DEPOSITO) {
+                depositar(novaTransacao.valor);
+        } 
+        else if (novaTransacao.tipoTransacao == TipoTransacao.TRANSFERENCIA || novaTransacao.tipoTransacao == TipoTransacao.PAGAMENTO_BOLETO) {
+                debitar(novaTransacao.valor);
+                novaTransacao.valor *= -1;
+        } 
+
+//código omitido
+```
+
+Então nós debitamos o valor com debitar(novaTransacao.valor) e depois transformamos ele em negativo, com novaTransacao.valor *= -1. Assim ele será registrado no histórico de transações como o sinal de subtração na frente.
+
+Testando as alterações  
+Voltando para a página do Bytebank, podemos testar as mudanças que fizemos. Então na seção "Nova transação" selecionaremos a opção "Depósito", passando o valor 500 e a data "10/04/2023".
+
+Tipo de transação: Depósito
+
+Valor: 500
+
+Data: 10/04/2023
+
+Ao clicarmos em "Concluir transação", automaticamente aparece o registro na coluna de extrato com a data de 10/04. Agora faremos uma transferência de 600 reais, com a data de 20/05/2023.
+
+Tipo de transação: Transferência
+
+Valor: 600
+
+Data: 20/05/2023
+
+Ao clicarmos em "Concluir transação", entrou como outro grupo, que é o de maio, com a data correta do dia 20/05 e com o valor negativo, ou seja, -R$ "600,00". Para um último teste, faremos um Pagamento de Boleto com uma data de abril, então ele precisa entrar no agrupamento do nosso depósito.
+
+Tipo de transação: Pagamento de Boleto
+
+Valor: 150
+
+Data: 20/04/2023
+
+Quando clicamos em "Concluir transação", nosso pagamento aparece no grupo de abril e também com um valor negativo. Portanto concluímos nossa aplicação, que está funcionando perfeitamente.
+
+### Aula 5 - Para saber mais: datas no JS
+
+Imagine que você está em um equipe de pessoas desenvolvedoras de um aplicativo de reserva de bicicletas compartilhadas. Os usuários podem utilizar o aplicativo para alugar bicicletas em diferentes locais da cidade. Ao publicar o aplicativo, as pessoas usuárias estão tentando escolher uma data para agendar o aluguel da bicicleta e encontram dificuldades em entender por que algumas reservas parecem estar associadas a datas diferentes daquelas selecionadas.
+
+Nesse momento, a equipe de desenvolvimento fica em alerta e começa a investigar. Depois de um tempo, foi identificado que as datas escolhidas pelos usuários não estão sendo interpretadas de maneira precisa. Alguns aluguéis de bicicleta parecem estar sendo agendados para um dia antes do selecionado. Isso está causando confusão entre os usuários, que não conseguem entender por que suas reservas estão sendo registradas com datas erradas. Para resolver esse problema e proporcionar uma experiência de reserva mais precisa para as pessoas usuárias, será necessário adicionar um horário específico às datas selecionadas para agendamento. O trecho de código abaixo exemplifica a aplicação dessa solução:
+
+let dataEscolhida: Date = new Date(inputData.value + " 00:00:00");
+
+A solução adota a adição de um horário específico às datas para evitar ambiguidades na interpretação pelo JavaScript. Quando uma data é criada sem fornecer um horário, o JavaScript considera o horário como meia-noite (00:00:00) do dia selecionado. No entanto, a adição do horário "00:00:00" assegura que o início do dia seja claramente definido, eliminando a possibilidade de interpretações incorretas.
+
+A inclusão de um horário fixo na data cria um ponto de referência consistente, independentemente dos fusos horários ou de ajustes de horário. Isso evita problemas relacionados a mudanças de horário, como o horário de verão, e garante resultados precisos em operações que dependem de informações temporais corretas, como a reserva de bicicletas.
+
+Se você deseja saber mais sobre a funcionalidade de data do JavaScript, conheça os nossos artigos:
+
+- [Trabalhando com datas em JavaScript;](https://www.alura.com.br/artigos/trabalhando-com-datas-em-javascript)
+- [O objeto Format Date e o formato de datas em JavaScript;](https://www.alura.com.br/artigos/objeto-format-date-e-formato-datas-em-javascript)
+- [Como formatar datas, horas e moedas em JavaScript?](https://www.alura.com.br/artigos/formatar-datas-horas-moedas-javascript)
+
+### Aula 5 - Desafio: total investido por transação
+
+Bytebank Banco Digital é um banco fictício onde os clientes podem fazer depósitos, transferências e pagamentos de boletos. Seu objetivo é melhorar o registro das transações da conta, criando um método no objeto Conta que agrupe as transações por tipo e retorne um objeto com o total de cada tipo de transação.
+
+Código TypeScript de base:
+
+```JavaScript
+type ResumoTransacoes = {
+    totalDepositos: number;
+    totalTransferencias: number;
+    totalPagamentosBoleto: number;
+}
+```
+
+Opinião do instrutor
+
+Para resolver este problema, você pode criar um método chamado agruparTransacoes que retornará um objeto com o total de cada tipo de transação. A solução pode ser implementada usando um loop forEach para percorrer todas as transações e acumular os valores de acordo com o tipo de transação.
+
+```JavaScript
+agruparTransacoes(): ResumoTransacoes {
+    const resumo: ResumoTransacoes = { 
+    totalDepositos: 0, 
+totalTransferencias: 0, 
+totalPagamentosBoleto: 0 
+    };
+
+    this.transacoes.forEach(transacao => {
+        switch (transacao.tipoTransacao) {
+            case TipoTransacao.DEPOSITO:
+                resumo.totalDepositos += transacao.valor;
+                break;
+
+            case TipoTransacao.TRANSFERENCIA:
+                resumo.totalTransferencias += transacao.valor;
+                break;
+
+            case TipoTransacao.PAGAMENTO_BOLETO:
+                resumo.totalPagamentosBoleto += transacao.valor;
+                break;
+        }
+    });
+
+    return resumo;
+}
+```
+
+Adicione o método agruparTransacoes no objeto Conta no arquivo Conta.ts.
+
+### Aula 5 - Projeto final
+
+Caso queira revisar o código do projeto final do curso, você pode [baixá-lo neste link](https://github.com/alura-cursos/formacao-typescript-projeto-curso-02/archive/refs/heads/main.zip) ou acessar nosso [repositório do Github](https://github.com/alura-cursos/formacao-typescript-projeto-curso-02/tree/main).
+
+### Aula 5 - O que aprendemos?
+
+Durante esta última aula, exploramos os seguintes temas:
+
+- Realizamos o armazenamento das informações da aplicação utilizando o localStorage.
+- Agrupamos as transações por data e as exibimos por meio do componente de Extrato.
+- Modificamos o objeto Date das Transações para exibir corretamente a data no front-end.
+- Construímos toda a lógica do componente de Extrato com base no padrão utilizado pelos demais componentes.
+
+Desejamos ótimos estudos!
+
+### Aula 5 - Conclusão - Vídeo 6
+
+Transcrição  
+Parabéns, estudante!
+
+Você chegou ao final desse curso de TypeScript, construindo sua primeira aplicação e implementando nela os principais recurso que essa tecnologia te dá. Aprendemos, ao longo do curso como o TypeScript nos ajuda a melhorar a estrutura do nosso código, melhorando a previsibilidade sobre seu funcionamento.
+
+Descobrimos também que podemos ter uma organização mais profissional dentro do nosso projeto, o que independe do TypeScript, mas essa linguagem ajuda a nos aproximarmos mais do mundo real quando formos construir nossas aplicações. Isso pode acontecer utilizando o TypeScript de forma "pura", como nesse curso, ou usando frameworks, o que é mais comum atualmente.
+
+Fica meu convite para você construir suas próprias aplicações, desafiando-se. Continuem estudando esse tópico que é bastante extenso, porque tem muita coisa para ser aprendida.
+
+Além disso, você pode acessar o Discord da Alura para encontrar outras pessoas que estão estudando esse mesmo tópico e obter ajuda da comunidade. Também compartilhe nas redes sociais o projeto que você construiu com a hashtag #aprendiNaAlura!
+
+Vejo vocês na próxima!
