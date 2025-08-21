@@ -1330,11 +1330,399 @@ Nessa aula, você aprendeu como:
 
 ## Aula 5 - Validando Interações
 
-### Aula 5 -  - Vídeo 1
-### Aula 5 -  - Vídeo 2
-### Aula 5 -  - Vídeo 3
-### Aula 5 -  - Vídeo 4
-### Aula 5 -  - Vídeo 5
-### Aula 5 -  - Vídeo 6
-### Aula 5 -  - Vídeo 7
-### Aula 5 -  - Vídeo 8
+### Aula 5 - Validar débito - Vídeo 1
+
+Transcrição  
+Comentamos que conheceríamos uma nova funcionalidade da orientação a objetos. A implementação de classes no Typescript era uma maneira de conseguir separar algumas funcionalidades do nosso código.
+
+Inclusive, responsabilidade única é uma boa prática. Portanto, no nosso código do arquivo Conta.ts, criamos a classe, métodos, e também inserimos algumas validações. Vamos começar a separar essas validações do nosso código.
+
+Decorators  
+Dentro da pasta "src > types", vamos criar um novo arquivo que se chamará Decorators.ts. Vamos começar a construir uma função dentro desse arquivo.
+
+Para isso, digitamos export function na primeira linha. O nome dessa função será ValidaDebito(), com o "V" e o "D" em caixa alta.
+
+Entre os parênteses dessa função, colocaremos um target: any, um propertyKey: string e um descriptor: PropertyDescriptor. Depois, abrimos chaves:
+
+Decorators.ts
+
+```JavaScript
+export function ValidaDebito(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+
+}
+```
+
+Nós já temos vários termos em inglês que podem ficar confusos. Vamos entendê-los.
+
+O target receberá um objeto com método decorado; o método que queremos implementar o nosso ValidaDebito — por isso seu tipo é any, afinal, ele pode ser algo com diversos formatos.
+
+O propertyKey ("propriedade da chave" em português) é o nome do método que estamos usando. Ou seja, colocamos o método inteiro no target e, no propertyKey, colocamos apenas sua chave.
+
+Por fim, temos o descriptor. Este é um objeto do tipo PropertyDescriptor, e terá uma informação sobre o método, por exemplo, value. Nós usaremos esse objeto, então precisamos focar mais nele.
+
+Mas, você pode estar se perguntando agora:
+
+— Mônica, você está "inventando moda"! Olha o tanto de coisa que você colocou nessa função e você não explicou de onde você tirou tudo isso.
+
+A resposta para isso, e uma dica também, é: documentação. Na documentação do Typescript, podemos encontrar a estrutura padrão de um Decorator, exatamente como a que criamos acima.
+
+Ou seja, não escolhemos essa estrutura, pois ela é particular da linguagem Typescript e sugerida para criar um Decorator.
+
+Agora, podemos começar a construir a validação dentro dessa nova função.
+
+Entre as chaves, vamos adicionar um const originalMethod, o método original, recebendo descriptor.value — aquilo que vamos retornar do nosso objeto do tipo propertyKey.
+
+```JavaScript
+export function ValidaDebito(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+    const originalMethod = descriptor.value;
+        
+}
+```
+
+Observação: Estamos escrevendo em inglês porque essas propriedades são em inglês por padrão, então não conseguimos alterar.
+
+Depois, vamos declarar: descriptor.value = function (), passando como parâmetro valorDoDebito : number. Após os parênteses, abrimos chaves.
+
+```JavaScript
+export function ValidaDebito(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+    const originalMethod = descriptor.value;
+
+    descriptor.value = function (valorDoDebito: number) {
+        
+        }
+}
+```
+
+Dentro dessas chaves de function, faremos a validação que já existe em Conta.ts.
+
+Ou seja: se valorDoDebito for menor ou igual a zero, jogaremos um novo erro na tela com a mensagem "O valor a ser debitado precisa ser maior do que zero!".
+
+Depois do fechamento desse if, adicionaremos mais um if para realizar uma segunda validação: se o valorDoDebito for maior do que this.saldo, jogaremos mais um erro com a mensagem "Seu saldo é insuficiente para realizar a operação!"
+
+Por fim, após o fechamento das chaves desse novo if, vamos dar um return no originalMethod e aplicaremos o método .apply(). Entre os parênteses, passamos this, [valorDoDebito].
+
+```JavaScript
+// código omitido
+  descriptor.value = function (valorDoDebito: number) {
+    if (valorDoDebito <= 0) {
+      throw new Error("O valor a ser debitado precisa ser maior do que zero!");
+    }
+        
+        if (valorDoDebito > this.saldo) {
+            throw new Error("Seu saldo é insuficiente para realizar a operação!");
+    }
+        
+        return originalMethod.apply(this, [valorDoDebito]);
+    
+  };
+}
+```
+
+Por fim, após o fechamento das chaves do descriptor.value. ainda dentro da função ValidaDebito(), vamos retornar o descriptor:
+
+```JavaScript
+// código omitido
+    return descriptor;
+}
+```
+
+Antes de aplicar esse decorator ("validador") na nossa conta, vamos entender o que acabamos de fazer.
+
+Primeiramente, nós pegamos um descriptor.value e inserimos a função de validação dentro dele. Essa função valida se o valor do débito é menor do que zero e maior do que o saldo.
+
+Em seguida, ele retorna o método original (originalMethod) aplicando (apply) essa validação.
+
+Ao final, retornamos o descriptor com essas modificações.
+
+Aplicando a validação na conta  
+Acessaremos o arquivo Conta.ts e, onde antes tínhamos essa mesma validação, no método debitar(), vamos removê-la (linhas 71 a 76). Não precisamos mais validar diretamente nesse arquivo.
+
+Agora, antes do método debitar(), na linha 70, inserimos um @ValidaDebito:
+
+Conta.ts
+
+```JavaScript
+@ValidaDebito
+debitar(valor: number): void {
+        this.saldo -= valor;
+        Armazenador.salvar("saldo", this.saldo.toString());
+}
+```
+
+Nesse momento, receberemos um grande erro em inglês no terminal.
+
+A solução para isso é a seguinte: no arquivo tsconfig.json, onde temos a configuração do noEmitOnError na linha 5, vamos apertar "Enter". Então, na linha 6, vamos inserir a chave experimentalDecorators entre aspas, recebendo o valor true.
+
+```JavaScript
+tsconfig.json
+{
+    "compilerOptions": {
+        "target": "ES2022",
+        "outDir": "./dist/js/",
+        "noEmitOnError": true,
+        "experimentalDecorators": true
+    },
+    "include": [
+        "./src/**/*"
+    ]
+}
+```
+
+Poderemos conferir no terminal que o erro foi solucionado! Isso é porque precisamos informar ao Typescript que queremos usar decorators, o que vem desativado por padrão.
+
+Em resumo: Os decorators são uma função que podemos aplicar para executar antes de algum método. A sintaxe para chamar um decorator é @NomeDoDecorator, assim como fizemos com @ValidaDebito.
+
+Para saber mais sobre essa funcionalidade e também sobre o tsconfig.json, confira as atividades ao longo desta aula.
+
+Vamos praticar a aplicação dessa funcionalidade um pouco mais. Para isso, faremos outra validação no próximo vídeo.
+
+### Aula 5 - Validar depósito - Vídeo 2
+
+Transcrição  
+Vamos continuar praticando os decorators? Agora, aplicaremos outra validação: a de depósito.
+
+Para isso, vamos retornar ao arquivo Decorators.ts no VSCode e, no final, na linha 17, apertar "Enter" para abrir espaço.
+
+Na linha 19, vamos inserir um export function ValidaDeposito() e, entre os parênteses, target: any, propertyKey: string, descriptor: PropertyDescriptor. Depois, fechamos os parênteses e abrimos chaves.
+
+Decorators.ts
+
+```JavaScript
+export function ValidaDeposito (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+
+}
+```
+
+Essa estrutura é igual à que fizemos na linha um para o ValidaDebito(). No vídeo passado, explicamos que essa estrutura é da documentação do Typescript.
+
+Confira o Para Saber Mais dessa aula para ter uma explicação detalhada sobre cada um desses pontos e sair daqui sem nenhuma dúvida.
+
+Dentro das chaves, colocaremos const originalMethod recebendo descriptor.value. Em seguida, adicionamos um descriptor.value recebendo function (ValorDoDeposito: number). Depois dos parênteses, abrimos chaves novamente.
+
+```JavaScript
+export function ValidaDeposito (target: any, propertyKey; string, descriptor: PropertyDescriptor) 
+const originalMethod descriptor.value; 
+descriptor.value = function (valorDoDeposito: number) {
+
+}
+} 
+```
+
+Dentro dessas chaves, adicionaremos um if () dizendo que se valorDoDeposito for menor ou igual <= a zero 0, faça o seguinte: throw new Error() com a mensagem "O valor a ser depositado deve ser maior do que zero!".
+
+Após as chaves do if, inserimos um return originalMethod.apply() e passamos this, [valorDoDeposito].
+
+Por fim, após o fechamento das chaves do descriptor.value, faremos um return de descriptor.
+
+```JavaScript
+export function ValidaDeposito(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+  const originalMethod = descriptor.value;
+  descriptor.value = function (valorDoDeposito: number) {
+    if (valorDoDeposito <= 0) {
+      throw new Error("O valor a ser depositado deve ser maior do que zero!");
+    }
+    return originalMethod.apply(this, [valorDoDeposito]);
+  };
+  return descriptor;
+}
+```
+
+Salvamos o arquivo. Podemos notar que essa é a mesma estrutura do ValidaDebito():
+
+Pegamos o método original (originalMethod) do descriptor;
+
+inserimos dentro dele a função de validação (nesse caso, para validar se o depósito é maior do que zero; se não for, jogamos um erro na tela);
+
+por fim, retornamos o método com essa função para onde formos usar o decorator.  
+Para aplicar esse decorator, acessamos o arquivo Conta.ts e, antes da função depositar(), mais ou menos na linha 76, adicionamos um @ValidaDeposito e fazemos o import para não ter erro nenhum.
+
+Depois, podemos remover as linhas 78 a 80, onde fazíamos uma validação dentro do método depositar(), com o if. Teremos, então:
+
+Conta.ts
+
+```JavaScript
+@ValidaDeposito
+depositar(valor: number): void {
+        this.saldo += valor;
+        Armazenador.salvar("saldo", this.saldo.toString());
+}
+```
+
+Aplicamos duas validações diferentes com a mesma estrutura de decorator!
+
+Agora, você pode também seguir essa lógica e aplicar outras validações que você considerar interessantes e se achar que há alguma abertura para isso.
+
+Essa é uma funcionalidade muito bacana, e esperamos que você tenha entendido como utilizá-la.
+
+Lembre-se: há atividades e materiais extras ao longo da aula para você compreender melhor o assunto.
+
+### Aula 5 - Calculando execução - Exercício
+
+Você está desenvolvendo um sistema de gerenciamento de projetos para uma empresa de consultoria. Você quer usar decorators para adicionar funcionalidades extras aos seus métodos sem alterar o código original. Você criou um decorator chamado LogTempo que registra quanto tempo leva para executar um método. O código do decorator é o seguinte:
+
+```JavaScript
+// Define um decorator de método chamado LogTempo
+export function LogTempo(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+    // Guarda uma referência ao método original
+    const originalMethod = descriptor.value;
+
+    // Substitui o método original por uma nova função
+    descriptor.value = function (...args: any[]) {
+        // Obtém o tempo inicial
+        const startTime = Date.now();
+
+        // Chama o método original com os argumentos originais
+        const result = originalMethod.apply(this, args);
+
+        // Obtém o tempo final
+        const endTime = Date.now();
+
+        // Calcula a diferença em milissegundos
+        const duration = endTime - startTime;
+
+        // Registra o tempo de execução no console
+        console.log(`O método ${propertyKey} levou ${duration} ms para executar.`);
+
+        // Retorna o resultado original
+        return result;
+    }
+
+    // Retorna o descritor modificado
+    return descriptor;
+}
+```
+
+Você quer aplicar esse decorator ao método calcularCusto do seu projeto, que recebe como argumento o número de horas trabalhadas e retorna o custo total do projeto. Como você deve inserir o decorator no seu código?
+
+Selecione uma alternativa
+
+Resposta:  
+@LogTempo  
+calcularCusto(horas: number): number {
+    return horas * this.valorHora;
+}
+
+> Um decorator de método é uma expressão que é avaliada como uma função. Para aplicar um decorator de método, basta colocar o símbolo @ seguido pelo nome do decorator antes da declaração do método.
+
+### Aula 5 - Para saber mais: Decorators
+
+Você está desenvolvendo um sistema para uma biblioteca que precisa gerenciar os livros e os usuários. Você tem classes para representar os livros, os usuários e os empréstimos, mas você quer adicionar algumas funcionalidades extras a essas classes, como validação, formatação e log.
+
+Há duas alternativas que foram pensadas pelo time, sendo a primeira modificar as classes originais, mas isso pode causar problemas de manutenção e compatibilidade. Outra alternativa seria criar subclasses para cada funcionalidade extra, mas isso pode gerar muita duplicação de código e complexidade.
+
+Para resolver o problema, é possível usar decorators para anexar funcionalidades extras às classes e aos membros das classes sem alterar o código original. Decorators são funções que recebem informações sobre a declaração decorada e podem modificar o seu comportamento ou adicionar novas características. Por exemplo:
+
+```JavaScript
+// Define um decorator de método chamado ValidaString
+export function ValidaString(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+    // Guarda uma referência ao método original
+    const originalMethod = descriptor.value;
+
+    // Substitui o método original por uma nova função
+    descriptor.value = function (valor: any) {
+        // Verifica se o valor é uma string
+        if (typeof valor !== "string") {
+            // Se não for, lança um erro
+            throw new Error("O valor deve ser uma string!");
+        }
+
+        // Se for, chama o método original com o valor como argumento
+        return originalMethod.apply(this, [valor]);
+    }
+
+    // Retorna o descritor modificado
+    return descriptor;
+}
+```
+
+Em Typescript, você pode usar a sintaxe @expressão para aplicar um decorator a uma classe, método, propriedade ou parâmetro.
+
+```JavaScript
+// Importa o decorator ValidaString
+import { ValidaString } from "./ValidaString";
+
+// Define uma classe livro
+class Livro {
+  // Define uma propriedade titulo
+  titulo: string;
+
+  // Define um construtor que recebe o titulo como parâmetro
+  constructor(titulo: string) {
+    this.titulo = titulo;
+  }
+
+  // Aplica o decorator ValidaString ao método imprimirTitulo
+  @ValidaString
+  imprimirTitulo(valor: any) {
+    // Imprime o valor na tela
+    console.log(valor);
+  }
+}
+
+// Cria uma instância da classe Livro
+let livro = new Livro("Senhor dos Aneis");
+
+// Chama o método imprimirTitulo com um valor válido
+livro.imprimirTitulo("Senhor dos Aneis"); // OK
+
+// Chama o método imprimirTitulo com um valor inválido
+livro.imprimirTitulo(42); // Error: O valor deve ser uma string!
+```
+
+Decorators são um recurso experimental do Typescript que permite adicionar anotações e metaprogramação às declarações de classe e membros. Decorators são funções que podem ser aplicadas usando a forma @expressão, onde expressão deve ser avaliada como uma função que será chamada em tempo de execução com informações sobre a declaração decorada. Decorators podem ser usados para modificar o comportamento, adicionar novas características ou observar as declarações decoradas.
+
+Existem diferentes tipos de decorators, como decorators de classe, decorators de método, decorators de propriedade e decorators de parâmetro. Cada tipo de decorator tem uma assinatura específica e recebe diferentes argumentos. Decorators podem ser compostos ou criados por fábricas de decorators para personalizar a sua aplicação.
+
+### Aula 5 - Para saber mais: explorando o tsconfig.json
+
+Nós trabalhamos pouca coisa com o tsconfig.json durante o curso, mas ele é extremamente poderoso. Felizmente, a documentação oficial do TypeScript é uma fonte confiável e completa para aprender sobre o tsconfig.json.
+
+Recomendo que você acesse os seguintes links para se aprofundar no assunto:
+
+- [tsconfig-json:](https://www.typescriptlang.org/docs/handbook/tsconfig-json.html) Nesse link, você encontrará a documentação oficial do TypeScript sobre o tsconfig.json. Leia atentamente as informações fornecidas para ter uma compreensão geral do arquivo de configuração.
+- [propriedades explicadas:](https://www.typescriptlang.org/tsconfig) Nesse link, você encontrará informações detalhadas sobre as diferentes propriedades do tsconfig.json. Explore as propriedades que mais lhe interessam e anote as informações relevantes, como seu propósito e exemplos de uso.
+
+A documentação do TypeScript é uma excelente fonte de conhecimento, oferecendo desde explicações básicas até guias de boas práticas. Ao entender melhor o tsconfig.json, você poderá personalizar as configurações do seu projeto de acordo com suas necessidades específicas. Isso permitirá um maior controle sobre as regras de compilação e comportamento do TypeScript em seu projeto.
+
+### Aula 5 - Projeto final do curso
+
+Caso queira revisar o código até aqui ou começar a partir desse ponto, disponibilizamos os códigos realizados na aula anterior para [baixar nesse link](https://github.com/alura-cursos/formacao-typescript-projeto-curso-02/archive/refs/heads/aula05.zip) ou veja nosso [repositório do Github](https://github.com/alura-cursos/formacao-typescript-projeto-curso-02/tree/aula05).
+
+### Aula 5 - Para saber mais: compartilhando o aprendizado
+
+Se você chegou até aqui, espero que tenha seu projeto pronto (e se precisar de alguma ajuda, não deixe de abrir um tópico no fórum ou mandar mensagem no discord da Alura) e tenha adquirido muitos conhecimentos novos.
+
+Que tal compartilhar seu certificado, seu aprendizado até aqui ou até seu projeto comigo? Para isso, você pode:
+
+- Marcar a Alura nas redes sociais. Você pode encontrar os nossos perfis por aqui;
+- Me marcar através das minhas redes sociais, que podem ser visualizadas por aqui;
+- Enviar mensagem no Discord de alunos da Alura.
+
+### Aula 5 - Conclusão - Vídeo 3
+
+Transcrição  
+Parabéns por chegar até aqui! Fico muito contente em compartilhar essa jornada de aprendizado com você.
+
+Durante este curso, nós transformamos o código do Bytebank, que estava em programação funcional, para programação orientada a objetos.
+
+Adendo: não transformamos o código inteiro, mas apenas algumas partes específicas.
+
+Nesse processo, aprendemos sobre:
+
+- Criação de classes;
+- Criação de atributos;
+- Criação de métodos;
+- Herança;
+- Polimorfismo;
+- Encapsulamento;
+- etc.
+
+Tudo isso te ajudará a ser um profissional mais completo para o mercado de trabalho.
+
+Esperamos que você tenha gostado de todo esse desafio! Eu, particularmente, tinha muita dificuldade com Typescript e também com a orientação a objetos, e me diverti muito estudando esses assuntos com você!
+
+Não deixe de compartilhar o resultado do que você aprendeu neste curso nas suas redes sociais.
+
+Agora, vamos estudar mais para aumentar o saldo da nossa conta corrente, que está como R$5,00!
+
+Nos encontramos nos próximos cursos!

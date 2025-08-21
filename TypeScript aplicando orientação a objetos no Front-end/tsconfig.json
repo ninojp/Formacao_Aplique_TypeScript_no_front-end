@@ -5,6 +5,7 @@
         "module": "esnext",
         "strict": true,
         "removeComments": true,
+        "experimentalDecorators": true,
         "forceConsistentCasingInFileNames": true,
         "outDir": "./dist/js/",
         "rootDir": "./src"
