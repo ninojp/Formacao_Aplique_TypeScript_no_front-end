@@ -4,14 +4,14 @@
         "noEmitOnError": true,
         "module": "esnext",
         "strict": true,
+        "removeComments": true,
         "forceConsistentCasingInFileNames": true,
         "outDir": "./dist/js/",
         "rootDir": "./src"
     },
     "include": [
-        "src/**/*"
+        "src/**/*.ts"
     ]
 }
-
 //Se todos os seus arquivos TypeScript estão em src, só o "rootDir": "./src" já é suficiente.
 //Use "include" apenas se quiser especificar arquivos/pastas diferentes ou adicionais.

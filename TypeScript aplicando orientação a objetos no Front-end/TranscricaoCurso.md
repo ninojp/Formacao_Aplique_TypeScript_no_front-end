@@ -495,12 +495,609 @@ Nessa aula, você aprendeu como:
 
 ## Aula 2 - Encapsulando dados
 
-### Aula 2 -  - Vídeo 1
-### Aula 2 -  - Vídeo 2
-### Aula 2 -  - Vídeo 3
-### Aula 2 -  - Vídeo 4
-### Aula 2 -  - Vídeo 5
-### Aula 2 -  - Vídeo 6
-### Aula 2 -  - Vídeo 7
-### Aula 2 -  - Vídeo 8
-### Aula 2 -  - Vídeo 9
+### Aula 2 - Modificadores de acesso - Vídeo 1
+
+Transcrição  
+Na última aula, abordamos a diferença entre programação funcional e orientação a objetos. Agora, na tela do aplicativo ByteBank, temos um resultado visual que mostra no extrato algumas transferências que não realizamos durante o curso. Vamos entender de onde vem isso?
+
+Modificadores de acesso  
+Com o console do navegador aberto, encontraremos um aviso de que não foi possível carregar o arquivo TipoTransacao, com o erro 404 (Not found, ou seja, não encontrado).
+
+Vamos acessar o VS Code para resolver isso. No arquivo Conta.ts, nas linhas de código 1, 2 e 3, onde estão as importações, precisamos colocar a extensão .js ao final do nome dos arquivos.
+
+```JavaScript
+import { GrupoTransacao } from "./GrupoTransacao.js";
+import { TipoTransacao } from "./TipoTransacao.js";
+import { Transacao } from "./Transacao.js";
+```
+
+Feito isso, teremos no extrato somente um depósito que fizemos como teste. Agora, ao abrir o console novamente, não teremos mais o erro indicado aos arquivos.
+
+O navegador compreende somente JavaScript, e não TypeScript, então durante todo o momento em que trabalhamos no código, acontece uma conversão de linguagem. Porém, precisamos declarar os arquivos do tipo JavaScript em vez de TypeScript, por isso fizemos essa alteração.
+
+Modificador public  
+Retornando ao âmbito de contas bancárias, quando criamos uma conta em banco, não queremos que todas as pessoas tenham acesso a informações confidenciais, mas algumas coisas podem ser acessadas. Por exemplo: ao abrir o aplicativo, queremos ter acesso ao nome da conta.
+
+Não é considerada uma boa prática fazer isso diretamente com o atributo nome na classe Conta. A melhor prática para isso seria fazer um método. Então, após o constructor() da linha 15, criaremos um método chamado getTitular() na linha 19.
+
+Esse método irá retornar this.nome. Além disso, antes do método iremos adicionar a palavra-chave public para torná-lo público.
+
+```JavaScript
+public getTitular() {
+    return this.nome;
+}
+```
+
+Vamos acessar o nome da Joana, dona da conta. Então, mais adiante no código, na linha 93 após a criação de conta, usaremos a função console.log() recebendo conta.getTitular().
+
+```JavaScript
+console.log(conta.getTitular())
+```
+
+Após salvar as alterações, vamos retornar ao navegador e acessar o console novamente. Agora é retornado o nome "Joana da Silva Oliveira".
+
+Vamos entender melhor o public que utilizamos no método getTitular(). Por padrão, tudo o que está no nosso código sem essa palavra-chave está definido como público. Dessa forma, tudo está acessível, mas não é isso que gostaríamos de uma conta bancária.
+
+Não é interessante que seja possível mexer, por exemplo, no saldo e na transação diretamente. Então, aprenderemos outra palavra-chave muito importante.
+
+Modificador private
+Na linha de código 7, vamos adicionar private antes do atributo saldo, e também na linha 8 antes do atributo transacoes.
+
+```JavaScript
+private saldo: number = Armazenador.obter("saldo") || 0;
+private transacoes: Transacao[] = Armazenador.obter(("transacoes"), (key: string, value: any) => {
+    if (key === "data") {
+        return new Date(value);
+    }
+    return value;
+}) || [];
+```
+
+Feito isso, vamos retornar à função console.log() que adicionamos na linha 93, remover o método getTitular() de dentro dos parênteses, e tentar acessar transacoes.
+
+```JavaScript
+console.log(conta.transacoes)
+```
+
+Ao fazer essa alteração, o TypeScript indicará um erro com a seguinte mensagem:
+
+A propriedade transacoes é privada e somente acessível pela classe Conta.
+
+Ou seja, quando utilizamos a palavra-chave private, deixamos o atributo privado. Dessa forma, não conseguiremos acessar a informação diretamente, exceto por meio de um método público ou outra maneira.
+
+Modificador protected  
+Existe outra palavra-chave que podemos usar: a protected. Vamos alterar, por exemplo, a palavra-chave private do atributo saldo para protected. Além disso, vamos adicionar essa mesma palavra antes do atributo nome na linha de código 6.
+
+```JavaScript
+protected nome: string;
+protected saldo: number = Armazenador.obter("saldo") || 0;
+```
+
+Feito isso, vamos retornar à função console.log() da linha 93 e testar substituir transacoes por nome.
+
+```JavaScript
+console.log(conta.nome)
+```
+
+Nesse caso, também será indicado um erro. Ao posicionar o cursor sobre nome, teremos a explicação do erro:
+
+A propriedade nome é protegida e somente acessível pela classe Conta e suas subclasses.
+
+Note que há uma pequena diferença da palavra-chave private para protected. A diferença é que quando quisermos chamar a informação em alguma subclasse, isto é, uma classe filha (nesse momento, entra a questão de herança que comentamos anteriormente enquanto falávamos sobre orientação a objeto), conseguiremos acessar por ela.
+
+Em resumo, o modificador protected é como o private, mas com uma característica a mais.
+
+Tudo isso é chamado de encapsulamento, ou seja, nós encapsulamos na classe Conta algumas funções e métodos. Ainda não adicionamos tudo, mas é interessante ter desde já essa compreensão para depois melhorar e aumentar o projeto.
+
+Nesse momento, já podemos apagar a função console.log() da linha 93.
+
+Conclusão  
+Existe ainda outra funcionalidade, referente à questão de salvar no localStorage e resgatar o valor, que pode ser usado para conta normal, para outros tipos de conta, e assim por diante, quando o projeto aumentar. Criaremos uma nova classe para resolver esse problema.
+
+Faremos isso no próximo vídeo. Até lá!
+
+### Aula 2 - Consultando informações - Exercício
+
+Você está desenvolvendo um sistema para uma loja de eletrônicos. A loja possui uma classe chamada "Produto" que representa os produtos disponíveis para venda. A classe possui propriedades como nome e preço.
+
+A empresa decidiu adotar o encapsulamento para proteger as propriedades do objeto e garantir a consistência dos dados. Por isso, foram definidos os modificadores de acesso "private" para as propriedades internas da classe.
+
+A classe "Produto" possui os seguintes métodos e propriedades:
+
+```JavaScript
+export class Produto {
+   private nome: string;
+   private preco: number;
+
+   constructor(nome: string, preco: number) {
+      this.nome = nome;
+      this.preco = preco;
+   }
+
+   public getNome(): string {
+      return this.nome;
+   }
+
+   public getPreco(): number {
+      return this.preco;
+   }
+
+const produto = new Produto("Smartphone", 1500);
+export default produto;
+```
+
+Como você pode obter o nome do produto que foi criado no código anterior?
+
+Resposta:  
+Usando a expressão produto.getNome().
+
+> Essa expressão é correta porque o método getNome() da classe Produto é público, ou seja, ele pode ser chamado por outras classes. Esse método retorna o valor do atributo nome da instância do produto que foi criada no código anterior.
+
+### Aula 2 - Para saber mais: encapsulando dados
+
+Quando estamos desenvolvendo aplicações em TypeScript, é fundamental garantir a segurança e a integridade dos dados em nossas classes.O problema surge quando os membros de uma classe são acessíveis livremente, sem restrições. Isso pode levar a situações em que os dados internos da classe são modificados ou acessados incorretamente, comprometendo a consistência e a confiabilidade do código.
+
+A solução para esse problema é aplicar o conceito de encapsulamento em TypeScript. O encapsulamento permite ocultar a implementação interna de uma classe e fornecer apenas interfaces bem definidas para acessar e manipular seus dados.
+
+Para garantir o encapsulamento adequado em TypeScript é possível fazer uso dos modificadores de acesso, que são palavras-chave que controlam a visibilidade dos membros das classes. Os principais modificadores são: public, private e protected. Aqui está uma explicação de cada um desses modificadores:
+
+- public: O modificador public permite que os membros sejam acessados livremente de qualquer lugar. É o modificador padrão caso nenhum seja especificado.
+- private: O modificador private restringe o acesso aos membros somente à própria classe. Isso significa que eles não podem ser acessados ou modificados fora da classe.
+- protected: O modificador protected permite que os membros sejam acessados dentro da classe e também pelas classes derivadas (subclasses). No entanto, eles não são acessíveis fora das classes derivadas.
+
+### Aula 2 - Desafio: segurança da conta
+
+Chegou a hora de botar o conteúdo em prática! Durante o ínicio da aula, foram inseridos modificadores de acesso nos atributos das classes, mas é possível inserir também nos métodos e também alterar os que já foram colocados. Que tal, a partir do conteúdo do vídeo e do para saber mais, aplicar os que fazem mais sentido para cada caso do código? :)
+
+Opinião do instrutor
+
+Algumas dicas são: mantenha como public apenas os que todos podem visualizar, como o getTitular, e também os que são utilizados fora da classe, como o registrarTransacao.
+
+Agora, os métodos de deposito e debito somente são utilizados dentro da classe Conta, portanto, podem ser marcados como private. Por fim, é interessante manter o nome e saldo como protected, pois se houver a criação de novos tipos de contas eles podem ser utilizados.
+
+### Aula 2 - Nova classe - Vídeo 2
+
+Transcrição  
+Vamos dar continuidade e construir uma classe para o armazenamento!
+
+#### Nova classe
+
+Criando a classe Armazenador  
+Na pasta "types", criaremos um novo arquivo chamado Armazenador.ts. Nesse arquivo, vamos exportar a classe Armazenador com export class. Entre chaves, adicionaremos private constructor(), seguido de uma abertura e um fechamento de chaves.
+
+```JavaScript
+export class Armazenador {
+    private constructor() { }
+}
+```
+
+Além de exportar a classe, usamos o private constructor(), pois quando chamamos Armazenador, não precisamos enviar nada. Ele não será, por exemplo, um objeto com atributos nome, saldo e transacoes; ele servirá apenas para fazer o intermédio para resgatar os valores de localStorage.
+
+Implementando o método salvar()  
+Na sequência, entre as chaves da classe Armazenador, vamos criar um método chamado salvar(), o qual irá receber uma chave que será uma string, e um valor que será any. Após o fechamento de parênteses do método, colocaremos : void e abriremos chaves.
+
+Entre as chaves, vamos declarar uma constante chamada valorComoString, que será igual ao método JSON.stringify() recebendo entre parênteses valor.
+
+Logo abaixo, usaremos o recurso localStorage junto ao método setItem(), que receberá chave e valorComoString.
+
+```JavaScript
+static salvar(chave: string, valor: any): void {
+    const valorComoString = JSON.stringify(valor);
+    localStorage.setItem(chave, valorComoString);
+}
+```
+
+Esse método irá salvar algo no localStorage, transformar o que recebe em JSON, e depois armazenar no local storage com o método setItem().
+
+Implementando o método obter()  
+Nosso próximo passo é criar um método chamado obter(), que também irá receber o parâmetro chave como string, além de reviver? seguido de dois-pontos e uma abertura de parênteses contendo this: any, key: string, value: any. Após o fechamento dos parênteses, vamos adicionar uma função de seta (=>), também recebendo o tipo any.
+
+Para finalizar, vamos abrir e fechar chaves.
+
+```JavaScript
+obter(chave: string, reviver?: (this: any, key: string, value: any) => any) {
+
+}
+```
+
+Assim, criamos um método que será responsável por resgatar no localStorage as informações do extrato. Ele recebe como parâmetro uma chave que indica a localização no localStorage onde está a informação. Além disso, o método recebe uma função opcional chamada reviver?, para quando quisermos fazer uma conversão do valor recebido.
+
+A função opcional reviver? recebe três parâmetros, sendo dois deles do tipo any, o que significa que eles podem receber qualquer valor. Essa função é reutilizável, então há várias maneiras de chamá-la.
+
+Agora vamos trabalhar em como o método irá obter as informações do localStorage. Entre as chaves, vamos declarar uma constante chamada valor, que será igual ao objeto localStorage seguido do método getItem(), que recebe entre parênteses chave.
+
+```JavaScript
+const valor = localStorage.getItem(chave);
+```
+
+Em seguida, adicionaremos os blocos condicionais. O primeiro deles será o seguinte: se valor for nulo (if (valor === null)), será retornado null.
+
+```JavaScript
+if (valor === null) {
+    return null;
+}
+```
+
+O segundo bloco será o seguinte: se tivermos a função reviver (if (reviver)), será retornada a função JSON.parse() recebendo valor e reviver como argumentos.
+
+```JavaScript
+if (reviver) {
+    return JSON.parse(valor, reviver)
+}
+```
+
+Por fim, teremos o retorno (return) de JSON.parse() novamente, agora recebendo valor.
+
+```JavaScript
+return JSON.parse(valor);
+```
+
+Com isso, tentamos adquirir no localStorage a informação que tenha como identificação a chave enviada para o método obter(). Se nada for encontrado, será retornado null; se for recebida a função reviver, usada para fazer a conversão do valor, teremos como retorno a função JSON.parse() juntando tanto o valor quanto a função reviver.
+
+Caso nenhuma dessas condições seja atendida, acontecerá diretamente a função JSON.parse() retornando o valor, que será exibido na tela a partir do extrato.
+
+Resultado do arquivo Armazenador.ts:
+
+```JavaScript
+export class Armazenador {
+    private constructor() { }
+
+    static salvar(chave: string, valor: any): void {
+        const valorComoString = JSON.stringify(valor);
+        localStorage.setItem(chave, valorComoString);
+    }
+
+    static obter(chave: string, reviver?: (this: any, key: string, value: any) => any) {
+        const valor = localStorage.getItem(chave);
+
+        if (valor === null) {
+            return null;
+        }
+
+        if (reviver) {
+            return JSON.parse(valor, reviver)
+        }
+        return JSON.parse(valor);
+    }
+}
+```
+
+Utilizando a classe Armazenador no arquivo Conta.ts  
+Agora podemos chamar a classe Armazenador no arquivo Conta.ts, nos locais onde antes chamávamos diretamente o localStorage, como na linha 7, por exemplo, onde acessamos o saldo.
+
+Vamos remover tudo o que estiver depois do sinal de igual (=) e chamar a classe Armazenador junto ao método obter(), que recebe entre aspas duplas o saldo. Ao final, vamos usar o sinal de ou (||) seguido de 0.
+
+Trecho a ser substituído:
+
+```JavaScript
+JSON.parse(localStorage.getItem("saldo")) || 0;
+```
+
+Resultado:
+
+```JavaScript
+protected saldo: number = Armazenador.obter("saldo") || 0;
+```
+
+Conclusão  
+Nesse momento, será indicado um erro no método obter():
+
+A propriedade obter não existe no tipo typeof Armazenador.
+
+Para descobrir por que esse erro acontece, vamos resolver o problema no próximo vídeo. Até lá!
+
+### Aula 2 - Métodos static - Vídeo 3
+
+Transcrição  
+Vamos resolver o erro do método obter()?
+
+Métodos estáticos  
+Começaremos pelo arquivo Armazenador.ts. Antes de salvar (método salvar()) na linha de código 4, vamos adicionar a palavra-chave static.
+
+```JavaScript
+static salvar(chave: string, valor: any): void {
+    const valorComoString = JSON.stringify(valor);
+    localStorage.setItem(chave, valorComoString);
+}
+```
+
+Faremos o mesmo na linha 9, antes do método obter():
+
+```JavaScript
+static obter(chave: string, reviver?: (this: any, key: string, value: any) => any) {
+// código omitido
+```
+
+Feito isso, ao retornar para o arquivo Conta.ts, não teremos mais o erro indicado pelo TypeScript. Mas afinal, o que significa a palavra-chave static?
+
+A tradução literal da palavra é estático, então agora os métodos salvar() e obter() são estáticos. Mas somente a partir da tradução, é um pouco complicado fazer uma associação com o que acontece de fato ao utilizá-la.
+
+A palavra-chave static permite que os métodos sejam chamados sem precisar criar um objeto a partir da classe Armazenador. Por exemplo: quando queremos chamar os métodos da classe Conta, como getTitular() ou getGruposTransacoes(), precisamos criar uma conta.
+
+No entanto, para o Armazenador, não precisamos criar um armazenador cada vez que quisermos salvar algo no localStorage; precisamos apenas chamar a função.
+
+É para isso que servem os métodos estáticos.
+
+Sabendo isso, agora podemos substituir no arquivo Conta.ts os outros locais que usavam localStorage. Primeiramente, vamos fazer essa alteração na linha de código 9, onde temos o atributo transacoes. No lugar do trecho abaixo, colocaremos a classe Armazenador seguida do método obter().
+
+Trecho a ser substituído:
+
+```JavaScript
+JSON.parse(localStorage.getItem
+```
+
+Resultado:
+
+```JavaScript
+private transacoes: Transacao[] = Armazenador.obter(("transacoes"), (key: string, value: any) => {
+
+// código omitido
+```
+
+Para encontrar todos os localStorage que precisaremos substituir no código, podemos usar o atalho "Ctrl + F" e buscar pelo texto desejado.
+
+Na linha 67, também é usado o localStorage, junto ao método setItem(). Nesse caso, nós queremos salvar, então vamos substituir o trecho por Armazenador.salvar().
+
+Trecho a ser substituído:
+
+```JavaScript
+localStorage.setItem
+```
+
+Resultado:
+
+```JavaScript
+Armazenador.salvar("transacoes", JSON.stringify(this.transacoes));
+```
+
+Precisamos fazer a mesma alteração na linha 79:
+
+```JavaScript
+Armazenador.salvar("saldo", this.saldo.toString());
+```
+
+Por fim, vamos alterar a linha 88 da mesma forma:
+
+```JavaScript
+Armazenador.salvar("saldo", this.saldo.toString());
+```
+
+Conclusão  
+Sempre que criarmos uma classe, contendo métodos para os quais não precisamos criar novos objetos para usá-los, usaremos métodos estáticos.
+
+No entanto, agora o TypeScript reclama outros erros no nosso código. Tanto na classe Conta quanto na classe Armazenador, temos vários locais no código em que usamos o tipo any. Precisaremos aprender algumas coisas novas para evitar essa prática.
+
+Vamos aprender?
+
+### Aula 2 - Para saber mais: estático
+
+Quando estamos trabalhando com TypeScript, pode ser necessário criar classes e métodos que possam ser acessados sem precisar criar um objeto da classe. Os métodos estáticos são uma maneira poderosa de definir comportamentos e lógicas que podem ser usados diretamente na classe, sem a necessidade de criar objetos.
+
+Imagine que você tenha uma classe chamada Utils e deseja criar um método que converta uma string em letras maiúsculas. Em vez de criar uma instância da classe Utils toda vez que você precisar usar esse método, você pode declará-lo como um método estático. Isso permitirá que você acesse o método diretamente na classe, sem a necessidade de criar um objeto.
+
+Aqui está um exemplo de como criar e usar um método estático em TypeScript:
+
+```JavaScript
+class Utils {
+  static converterParaMaiusculas(texto: string): string {
+    return texto.toUpperCase();
+  }
+}
+
+// Chamando o método estático diretamente na classe
+const textoConvertido = Utils.converterParaMaiusculas("Olá, mundo!");
+console.log(textoConvertido); 
+// Saída no console: "OLÁ, MUNDO!"
+```
+
+No exemplo acima, definimos o método converterParaMaiusculas como um método estático usando a palavra-chave static antes de sua declaração. Isso significa que o método pertence à própria classe Utils, não a instâncias específicas da classe.
+
+A chamada do método é feita diretamente na classe, sem precisar criar um objeto Utils. Isso nos permite acessar o método de maneira conveniente, sem a necessidade de criar instâncias desnecessárias da classe.
+
+Os métodos estáticos são especialmente úteis quando temos lógicas ou funcionalidades que são aplicáveis a toda a classe em si, em vez de instâncias individuais da classe. Eles também podem ser usados para criar funções utilitárias ou fábricas de objetos, que não dependem do estado ou de uma instância específica da classe.
+
+Pensando na motivação da nossa classe Armazenador de construir funções utilitárias, é possível transferir o arquivo de dentro da pasta types, para a pasta utils.
+
+### Aula 2 - O que aprendemos?
+
+Nessa aula, você aprendeu como:
+
+- Utilizar os modificadores de acesso para controlar a visibilidade dos membros de uma classe;
+- Aplicar o encapsulamento em TypeScript para proteger os dados internos de uma classe;
+- Utilizar os métodos públicos para obter informações de propriedades privadas de uma classe de forma segura;
+- Criar e utilizar métodos estáticos em TypeScript para definir comportamentos e lógicas que podem ser acessados diretamente na classe, sem a necessidade de criar objetos.
+
+## Aula 3 - Lidando com Tipos
+
+### Aula 3 - Projeto da aula anterior
+
+Caso queira revisar o código até aqui ou começar a partir desse ponto, disponibilizamos os códigos realizados na [aula anterior para download](https://github.com/alura-cursos/formacao-typescript-projeto-curso-02/archive/refs/heads/aula02.zip) ou veja nosso [repositório do Github](https://github.com/alura-cursos/formacao-typescript-projeto-curso-02/tree/aula02).
+
+### Aula 3 - Tipo genérico - Vídeo 1
+
+Transcrição  
+Quando estávamos preparando os métodos do arquivo Armazenador.ts, inserimos várias palavras "any", que aceitam vários tipos de dados. Por exemplo, se inserirmos qualquer tipo de dado na função reviver na linha 9, ele será aceito.
+
+Lidando com Tipos e Previsibilidade em Funções
+No entanto, uma das vantagens do TypeScript é podermos lidar com tipos, seja definindo o tipo de retorno ou o que vamos enviar para aquela função. Vamos inserir um tipo de retorno na função obter para ter mais previsibilidade do que está acontecendo dentro dela.
+
+Arquivo Armazenador.ts no repositório do GitHub
+
+Para atingir esse objetivo, na linha 9, em static obter, vamos inserir um sinal de menor, seguido pela letra T maiúscula e depois o sinal de maior: <T>. No final da mesma linha, após o último any, vamos inserir dois pontos, a letra T maiúscula, uma barra vertical e a palavra null.
+
+Armazenador.ts
+
+```JavaScript
+// código omitido
+
+    static obter<T>(chave: string, reviver?: (this: any, key: string, value: any) => any): T | null {
+        const valor = localStorage.getItem(chave);
+
+        if (valor === null) {
+            return null;
+        }
+
+        if (reviver) {
+            return JSON.parse(valor, reviver) 
+        }
+        return JSON.parse(valor);
+    }
+}
+```
+
+Informamos que a função obter terá um retorno do tipo T. Esse tipo T é genérico, o que significa que ao chamarmos esse método, definimos o tipo desejado para o retorno. Utilizamos a letra T apenas como um marcador, mas poderia ser qualquer letra do alfabeto.
+
+Mas o interessante aqui é que utilizamos essa letra T para associar com o tipo desejado. E ao inserirmos <T>, garantimos que a função obter retornará o tipo que informamos na chamada do método, através do T, ou nulo, ou seja, nada.
+
+Então, precisamos também lidar com o retorno quando ele pode ser um JSON.parse, caso contrário, a questão de inserir o tipo genérico não funcionará corretamente. Na linha 17 e na linha 20, dentro do return JSON.parse(), inserimos o as T dentro e fora do if(reviver).
+
+Armazenador.ts
+
+```JavaScript
+// código omitido
+
+    static obter<T>(chave: string, reviver?: (this: any, key: string, value: any) => any): T | null {
+        const valor = localStorage.getItem(chave);
+
+        if (valor === null) {
+            return null;
+        }
+
+        if (reviver) {
+            return JSON.parse(valor, reviver) as T
+        }
+        return JSON.parse(valor) as T;
+    }
+}
+```
+
+Assim, quando for retornado o valor convertido para o JSON.parse(), ele também será identificado com o tipo genérico que estamos enviando.
+
+Conclusão  
+Pode não ter ficado tão claro sobre o que é esse tipo genérico, também chamado de Generics. Mas no próximo vídeo, ao aplicarmos em Conta.ts, ficará mais fácil de visualizar na prática a usabilidade disso.
+
+### Aula 3 - O tipo certo - Exercício
+
+Você é um desenvolvedor(a) trabalhando em um sistema de gerenciamento de pedidos para uma loja online. A loja vende diferentes tipos de produtos, como roupas, eletrônicos e livros. No entanto, você está enfrentando um problema ao implementar a função de calcular o valor total do pedido no sistema.
+
+```JavaScript
+calcularValorTotal(pedido: any[]): number {
+ // código omitido
+}
+```
+
+Atualmente, você está utilizando o tipo any para representar os produtos no pedido, mas isso resulta em uma perda de segurança de especificação de tipo. Qual é a solução mais adequada para lidar com esse problema?
+
+Selecione uma alternativa
+
+Resposta:  
+Utilizar generics com o tipo <T> para permitir a escolha do tipo de produto no momento da utilização da função de calcular o valor total.
+
+> Ao utilizar generics, podemos parametrizar o tipo de produto que será utilizado na função de calcular o valor total. Isso nos permite manter a flexibilidade de calcular o valor total de diferentes tipos de produtos, sem perder a segurança de tipo fornecida pelo TypeScript. O <T> representa um espaço reservado para o tipo de produto que será determinado no momento da utilização da função de calcular o valor total.
+
+### Aula 3 - Para saber mais tipos parametrizados
+
+Você está desenvolvendo um sistema de gerenciamento de estoque para uma loja online que vende diferentes tipos de produtos, como roupas, eletrônicos e livros. Você precisa criar uma função que receba um array de produtos e retorne o valor total do estoque.
+
+Você tenta usar o tipo any para representar os produtos na função, mas isso resulta em uma perda de segurança de especificação de tipo. Você não consegue garantir que o array passado seja realmente de produtos, nem acessar as propriedades específicas de cada tipo de produto. Isso pode causar erros em tempo de execução e dificultar a manutenção do código.
+
+Você decide usar o conceito de generics para tornar a função mais flexível e segura. Generics são tipos parametrizados que permitem que você defina o tipo de um argumento ou retorno de uma função no momento da sua utilização. Assim, você pode criar uma função que aceite qualquer tipo de array, desde que ele seja compatível com uma interface que defina as propriedades comuns a todos os tipos de produtos.
+
+Generics são uma forma de reutilizar código e evitar duplicação. Eles permitem que você crie funções e classes que funcionem com diferentes tipos de dados, sem perder a segurança de tipo fornecida pelo typescript. Para usar generics, você precisa usar um espaço reservado para o tipo, como <T>, na declaração da função ou classe. Esse espaço reservado será substituído pelo tipo real no momento da utilização da função ou classe. Você também pode restringir o tipo genérico usando a palavra-chave extends, indicando que ele deve ser um subtipo de outro tipo ou interface. Por exemplo:
+
+```JavaScript
+interface Produto { 
+nome: string; preco: number; quantidade: number; 
+}
+
+function calcularValorTotal<T extends Produto>(produtos: T[]): number { 
+let valorTotal = 0; 
+for (let x = 0; x < produtos.length; x++) { 
+valorTotal += produtos[x].preco * produtos[x].quantidade; 
+} 
+return valorTotal; 
+}
+```
+
+Generics são muito úteis para criar funções e classes mais genéricas e reutilizáveis, sem perder a segurança e a precisão dos tipos.
+
+### Aula 3 - Especificando tipos - Vídeo 2
+
+Transcrição  
+Nesta aula, vamos usar o método com esse tipo genérico.
+
+Arquivo Conta.ts no repositório do GitHub
+
+Flexibilizando a Função Obter: Tipos Específicos para Saldo e Transações
+Na linha 8 e 9 é onde chamamos o Armazenador:
+
+Conta.ts
+
+```JavaScript
+// código omitido
+
+export class Conta {
+    protected nome: string;
+    protected saldo: number = Armazenador.obter("saldo") || 0;
+    private transacoes: Transacao[] = Armazenador.obter(("transacoes"), (key: string, value: any) => {
+        if (key === "data") {
+            return new Date(value);
+        }
+        return value;
+    }) || [];
+
+// código omitido
+```
+
+Agora, vamos declarar o tipo desejado para o retorno, que será o tipo saldo, representado por valores de dinheiro na forma de número. Portanto, depois de obter("saldo"), adicionamos `<number>`.
+
+Conta.ts
+
+```JavaScript
+// código omitido
+
+protected saldo: number = Armazenador.obter<number>("saldo") || 0;
+
+// código omitido
+```
+
+Dessa forma, ao chamarmos o obter na linha 8 para o saldo, sendo o mesmo obter de transações na linha 9, estamos declarando que o que retornar de lá será um número, representando o saldo do cliente.
+
+Vamos praticar isso novamente, na linha 9, após o obter, definimos que desejamos o tipo <Transacao[]>, e salvamos.
+
+Conta.ts
+
+```JavaScript
+// código omitido
+
+protected saldo: number = Armazenador.obter<number>("saldo") || 0;
+private transacoes: Transacao[] = Armazenador.obter<Transacao[]>(("transacoes"), (key: string, value: any) => {
+        if (key === "data") {
+            return new Date(value);
+        }
+
+// código omitido
+```
+
+Mesma função, mesma maneira de chamar, mas determinamos que as duas formas que serão chamadas não retornarão o mesmo tipo de dado. A função obter está flexível e de acordo com o que desejamos dela, então em <Transacao[]> estamos definindo uma lista (array) e transações, sendo o que será retornado na chamada a linha 9.
+
+Conclusão  
+Conseguimos deixar essa questão da função obter mais flexível, no entanto, há outros detalhes em que a programação orientada a objetos pode nos auxiliar. Na sequência, vamos aprender outros conceitos que a programação orientada a objetos nos proporciona para programar.
+
+### Aula 3 - O que aprendemos?
+
+Nessa aula, você aprendeu como:
+
+- Usar generics para criar componentes flexíveis e reutilizáveis que funcionam com diferentes tipos de dados de forma segura e consistente;
+- Definir o tipo <T> para representar um tipo genérico que será determinado no momento da utilização do componente;
+Aplicar o operador “as T” para definir explicitamente o tipo de retorno ao realizar a conversão de JSON para o tipo original.
+
+## Aula 4 - Herdando atributos
+
+### Aula 4 -  - Vídeo 1
+### Aula 4 -  - Vídeo 2
+### Aula 4 -  - Vídeo 3
+### Aula 4 -  - Vídeo 4
+### Aula 4 -  - Vídeo 5
+### Aula 4 -  - Vídeo 6
+### Aula 4 -  - Vídeo 7

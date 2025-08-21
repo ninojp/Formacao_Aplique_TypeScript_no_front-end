@@ -7,7 +7,6 @@ if (elementoDataAcesso) {
     elementoDataAcesso.textContent = formatarData(Conta.getDataAcesso(), FormatoData.DIA_SEMANA_DIA_MES_ANO);
 }
 ;
-//--------------------------------------------------------------------------------------
 renderizarSaldo();
 function renderizarSaldo() {
     const elementoSaldo = document.querySelector('.saldo-valor .valor');

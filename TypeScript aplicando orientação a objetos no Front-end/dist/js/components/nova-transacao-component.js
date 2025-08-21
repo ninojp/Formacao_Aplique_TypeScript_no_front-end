@@ -11,21 +11,17 @@ elementoFormulario.addEventListener('submit', function (event) {
             return;
         }
         ;
-        //---------------------------------------------------------------------------------------------------
         const inputTipoTransacao = elementoFormulario.querySelector('#tipoTransacao');
         const inputValor = elementoFormulario.querySelector('#valor');
         const inputData = elementoFormulario.querySelector('#data');
-        //---------------------------------------------------------------------------------------------------
-        let tipoTransacao = inputTipoTransacao.value; // Convertendo o valor do input para o tipo(ENUN) TipoTransacao
+        let tipoTransacao = inputTipoTransacao.value;
         let valor = inputValor.valueAsNumber;
-        let data = new Date(inputData.value + ' 00:00:00'); // Adicionando horário para a data, caso contrário, o JavaScript não entende corretamente a data.
-        //---------------------------------------------------------------------------------------------------
+        let data = new Date(inputData.value + ' 00:00:00');
         const novaTransacao = {
             tipoTransacao: tipoTransacao,
             valor: valor,
             data: data
         };
-        //---------------------------------------------------------------------------------------------------
         Conta.registrarTransacao(novaTransacao);
         SaldoComponent.atualizar();
         ExtratoComponent.atualizar();

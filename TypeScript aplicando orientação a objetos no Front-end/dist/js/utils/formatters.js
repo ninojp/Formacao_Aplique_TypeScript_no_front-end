@@ -1,13 +1,10 @@
 import { FormatoData } from "../types/FormatoData.js";
 export function formatarMoeda(valor) {
-    //toLocaleString() é um método que formata o número de acordo com a localidade especificada.
     return valor.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' });
 }
 ;
-//====================================================================================================
 export function formatarData(data, formato = FormatoData.PADRAO) {
     if (formato === FormatoData.DIA_SEMANA_DIA_MES_ANO) {
-        //toLocaleDateString() é um método que formata a DATA de acordo com a localidade especificada.
         return data.toLocaleDateString('pt-br', {
             weekday: 'long',
             day: '2-digit',
