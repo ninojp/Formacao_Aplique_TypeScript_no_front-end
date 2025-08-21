@@ -1,0 +1,39 @@
+'use strict';
+import Conta from "../types/Conta.js";
+import { TipoTransacao } from "../types/TipoTransacao.js";
+import { Transacao } from "../types/Transacao.js";
+import ExtratoComponent from "./extrato-component.js";
+import SaldoComponent from "./saldo-component.js";
+
+const elementoFormulario = document.querySelector('.block-nova-transacao form') as HTMLFormElement;
+elementoFormulario.addEventListener('submit', function (event) {
+    try {
+        event.preventDefault();
+        if (!elementoFormulario.checkValidity()) {
+            alert('Por Favor, Preencha todos os campos da transação!');
+            return;
+        };
+        //---------------------------------------------------------------------------------------------------
+        const inputTipoTransacao = elementoFormulario.querySelector('#tipoTransacao') as HTMLSelectElement;
+        const inputValor = elementoFormulario.querySelector('#valor') as HTMLInputElement;
+        const inputData = elementoFormulario.querySelector('#data') as HTMLInputElement;
+        //---------------------------------------------------------------------------------------------------
+        let tipoTransacao: TipoTransacao = inputTipoTransacao.value as TipoTransacao;// Convertendo o valor do input para o tipo(ENUN) TipoTransacao
+        let valor: number = inputValor.valueAsNumber;
+        let data: Date = new Date(inputData.value + ' 00:00:00'); // Adicionando horário para a data, caso contrário, o JavaScript não entende corretamente a data.
+        //---------------------------------------------------------------------------------------------------
+        const novaTransacao: Transacao = {
+            tipoTransacao: tipoTransacao,
+            valor: valor,
+            data: data
+        };
+        //---------------------------------------------------------------------------------------------------
+        Conta.registrarTransacao(novaTransacao);
+        SaldoComponent.atualizar();
+        ExtratoComponent.atualizar();
+        elementoFormulario.reset();
+    } catch (erro: any) {
+        alert(erro.message);
+    };
+});
+
