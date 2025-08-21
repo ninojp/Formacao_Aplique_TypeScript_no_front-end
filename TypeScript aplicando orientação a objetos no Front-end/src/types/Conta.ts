@@ -87,9 +87,23 @@ export class Conta {
     };
 
 };
+//==================================================================
+export class ContaPremium extends Conta {
+    registrarTransacao(transacao:Transacao):void {
+        if(transacao.tipoTransacao === TipoTransacao.DEPOSITO) {
+            console.log('Vc Ganhou um bônus de 0.5 centavos!');
+            transacao.valor += 0.5;
+        };
+        //SUPER indica que a classe ContaPremium está chamando o método da classe pai Conta
+        super.registrarTransacao(transacao);
+    };
+};
+//==================================================================
 const conta = new Conta('Nino JP');
+const contaPremium = new ContaPremium('Edenilson JP')
 export default conta;
 
-console.log(conta.getTitular());
+//=================================
+// console.log(conta.getTitular());
 // console.log(conta.#transacoes);
 // console.log(conta.nome);

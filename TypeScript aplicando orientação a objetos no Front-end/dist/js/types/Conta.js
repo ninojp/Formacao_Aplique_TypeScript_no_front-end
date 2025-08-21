@@ -88,6 +88,18 @@ export class Conta {
     ;
 }
 ;
+export class ContaPremium extends Conta {
+    registrarTransacao(transacao) {
+        if (transacao.tipoTransacao === TipoTransacao.DEPOSITO) {
+            console.log('Vc Ganhou um bônus de 0.5 centavos!');
+            transacao.valor += 0.5;
+        }
+        ;
+        super.registrarTransacao(transacao);
+    }
+    ;
+}
+;
 const conta = new Conta('Nino JP');
+const contaPremium = new ContaPremium('Edenilson JP');
 export default conta;
-console.log(conta.getTitular());

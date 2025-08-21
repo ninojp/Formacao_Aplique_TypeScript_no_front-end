@@ -1094,10 +1094,247 @@ Aplicar o operador “as T” para definir explicitamente o tipo de retorno ao r
 
 ## Aula 4 - Herdando atributos
 
-### Aula 4 -  - Vídeo 1
-### Aula 4 -  - Vídeo 2
-### Aula 4 -  - Vídeo 3
-### Aula 4 -  - Vídeo 4
-### Aula 4 -  - Vídeo 5
-### Aula 4 -  - Vídeo 6
-### Aula 4 -  - Vídeo 7
+### Aula 4 - Projeto da aula anterior
+
+Caso queira revisar o código até aqui ou começar a partir desse ponto, disponibilizamos os códigos realizados na [aula anterior para download](https://github.com/alura-cursos/formacao-typescript-projeto-curso-02/archive/refs/heads/aula03.zip) ou veja nosso [repositório do Github](https://github.com/alura-cursos/formacao-typescript-projeto-curso-02/tree/aula03).
+
+### Aula 4 - Conta premium - Vídeo 1
+
+Transcrição  
+Agora o ByteBank irá oferecer uma nova funcionalidade, possibilitando a criação de uma conta premium. Isso permitirá que as pessoas usuárias ganhem um bônus, fazendo parte de um programa de recompensas, onde cada transação renderá um bônus de R$0,50.
+
+Nova Funcionalidade: Conta Premium com Programa de Recompensas
+Para implementar essa funcionalidade, vamos ao arquivo Conta.ts, antes da criação da conta antiga, na linha 93. A partir desta linha, vamos adicionar a classe ContaPremium com o método registrarTransacao(transacao: Transacao): void. Dentro dessas chaves, colocamos um if() verificando se transacao.tipoTransacao === TipoTransacao.DEPOSITO. Em seguida, abrimos e fechamos as chaves {}.
+
+Por enquanto, temos:
+
+Conta.ts
+
+```JavaScript
+// código omitido
+
+export class ContaPremium {
+    registrarTransacao(transacao: Transacao): void {
+        if (transacao.tipoTransacao === TipoTransacao.DEPOSITO) {
+        }
+    }
+}
+
+// código omitido
+```
+
+Dentro do if() podemos inserir um console.log("ganhou um bônus de 0.50 centavos");. Na linha seguinte, colocamos transacao.valor += 0.5 e após o if() registramos a transação usando super.registrarTransacao(transacao).
+
+Conta.ts
+
+```JavaScript
+// código omitido
+
+export class ContaPremium {
+    registrarTransacao(transacao: Transacao): void {
+        if (transacao.tipoTransacao === TipoTransacao.DEPOSITO) {
+                    console.log("ganhou um bônus de 0.50 centavos");
+                    transacao.valor += 0.5
+        }
+        this.registrarTransacao(transacao)
+    }
+}
+
+// código omitido
+```
+
+Neste momento, a instrutora corrige um erro. No código dela, no if(), está escrito if(transacao.tipo === TipoTransacao.DEPOSITO), e há um sublinhado vermelho em ".tipo". Esse erro indica que a propriedade tipo não existe no tipo Transação. Para corrigir isso, podemos verificar no código o trecho onde estávamos usando algo semelhante, na linha 54, onde verificamos o tipoTransacao e não apenas tipo. A partir disso, ela corrigiu de transacao.tipo para transacao.tipoTransacao.
+
+Dessa forma, temos uma nova classe ContaPremium, semelhante à classe Conta, onde temos um método chamado registrarTransacao() que já tínhamos antes. Agora, porém, ele fará outra coisa: vai verificar se o tipo de transação é do tipo "depósito". Se for, a pessoa ganha o bônus de 0,5. Em seguida, ele registra a transação na lista do Local Storage.
+
+A partir disso, para criar a ContaPremium, podemos, após a criação da conta da Joana criar uma nova ContaPremium seguindo a mesma lógica.
+
+Conta.ts
+
+```JavaScript
+// código omitido
+
+const conta = new Conta("Joana da Silva Oliveira");
+const contaPremium = new ContaPremium("Mônica Hillman");
+
+export default conta;
+```
+
+Observem que recebemos um aviso informando que a ContaPremium espera zero argumento e recebeu um. Provavelmente isso ocorre pelo fato de não termos indicado o que a classe ContaPremium deve receber, mas gostaríamos que ela reutilizasse algumas informações da Conta.
+
+Conclusão  
+Mas aprenderemos sobre isso no próximo vídeo.
+
+### Aula 4 - Herdando da conta - Vídeo 2
+
+Transcrição  
+Na linha 104, podemos observar um sublinhado na cor vermelha abaixo de Mônica Hillman, isso significa que há um erro. Ao colocarmos o mouse sobre o sublinhado, é exibida a seguinte mensagem informando o motivo do erro:
+
+Expected 0 arguments, but got 1.
+
+Isso ocorre porque, ao criarmos a classe ContaPremium, não incluímos atributos nem um construtor. Como consequência, não é esperado o recebimento de argumentos. Para evitar a necessidade de recriar todas as informações, atributos e construtores, podemos ir à linha 93 e adicionar a herança da classe Conta, utilizando o comando extends, após a declaração da classe ContaPremium. Assim, a classe ContaPremium herdará os atributos e métodos da classe Conta.
+
+Conta.ts
+
+```JavaScript
+// código omitido
+export class ContaPremium extends Conta {
+    registrarTransacao(transacao: Transacao): void {
+        if (transacao.tipoTransacao === TipoTransacao.DEPOSITO) {
+                    console.log("ganhou um bônus de 0.50 centavos");
+                    transacao.valor += 0.5
+        }
+        this.registrarTransacao(transacao)
+    }
+}
+// código omitido
+```
+
+Em programação orientada a objetos, a herança implica que estamos adquirindo ou estendendo a classe Conta. Consequentemente, todos os elementos presentes na classe Conta estarão disponíveis na classe ContaPremium.
+
+Contudo, ao utilizarmos o método registrarTransacao(), estamos realizando uma sobrescrita, ou seja, criando um novo método registrarTransacao(), no qual ao efetuar um depósito, adicionamos 0,5 a mais ao valor.
+
+Em seguida, utilizamos o this.registrarTransacao(transacao), o qual não funcionará corretamente, pois ele invocará o registrarTransacao() que não realiza o depósito, apenas efetua a verificação. No entanto, o que desejamos é chamar o método registrarTransacao() original, que executa o depósito necessário.
+
+Utilizando Super para Aproveitar Herança na Classe ContaPremium
+Para alcançar esse objetivo, substituímos o this por super. Com essa alteração, pretendemos utilizar algo que está dentro da nossa classe Pai ou Mãe, ou seja, da classe que estamos herdando. Portanto, invocamos o registrarTransacao() da linha 53 (registrarTransacao(novaTransacao: Transacao)), assim, a verificação é realizada novamente, e verifica-se se será feito o depósito ou o débito que já existia na conta.
+
+Conta.ts
+
+```JavaScript
+// código omitido
+
+export class ContaPremium extends Conta {
+    registrarTransacao(transacao: Transacao): void {
+        if (transacao.tipoTransacao === TipoTransacao.DEPOSITO) {
+                    console.log("ganhou um bônus de 0.50 centavos");
+                    transacao.valor += 0.5
+        }
+        super.registrarTransacao(transacao)
+    }
+}
+
+// código omitido
+```
+
+Dessa forma, não precisamos repetir código e fazer somente o que é importante para a ContaPremium.
+
+Conclusão  
+Além disso, ao aplicarmos a programação orientada a objetos, temos à nossa disposição outros recursos que nos auxiliarão em conjunto com o TypeScript.
+
+### Aula 4 - Tipos de usuários - Exercício
+
+Imagine que você está desenvolvendo um sistema para uma escola que precisa gerenciar os dados dos alunos e dos professores. Você decide usar herança para criar classes que representem esses dois tipos de usuários, aproveitando as características comuns entre eles. Considere o seguinte código em Typescript:
+
+```JavaScript
+class Usuario {
+  nome: string;
+  email: string;
+  senha: string;
+
+  constructor(nome: string, email: string, senha: string) {
+    this.nome = nome;
+    this.email = email;
+    this.senha = senha;
+  }
+}
+```
+
+Qual das alternativas abaixo mostra como criar uma classe Aluno que herda da classe Usuario e adiciona um atributo matricula?
+
+Selecione uma alternativa
+
+Resposta:
+
+```JavaScript
+class Aluno extends Usuario {
+    matricula: number;
+    constructor(nome: string, email: string, senha: string, matricula: number) {
+    super(nome, email, senha);
+    this.matricula = matricula;
+  }
+}
+```
+
+> Ela usa a palavra-chave extends para indicar que a classe Aluno é derivada da classe Usuario, e usa a função super para chamar o construtor da classe pai.
+
+### Aula 4 - Para saber mais: estendendo classes
+
+Você está trabalhando em um projeto de um jogo de RPG que tem vários tipos de personagens, como guerreiras, magos, arqueiras, etc. Cada tipo de personagem tem suas próprias habilidades, atributos e equipamentos, mas também compartilha algumas características comuns, como nome, nível, vida e experiência.
+
+Para representar cada tipo de personagem, você irá criar classes, mas não quer repetir o código das características comuns em todas elas. Além disso, você quer que o seu código seja fácil de entender e manter.
+
+```JavaScript
+// Classe pai que representa um personagem genérico
+class Personagem {
+  nome: string;
+  nivel: number;
+  vida: number;
+  experiencia: number;
+
+  constructor(nome: string) {
+    this.nome = nome;
+    this.nivel = 1;
+    this.vida = 100;
+    this.experiencia = 0;
+  }
+
+  atacar(alvo: Personagem): void {
+    // implementar a lógica do ataque
+  }
+
+  defender(): void {
+    // implementar a lógica da defesa
+  }
+
+  ganharExperiencia(pontos: number): void {
+    // implementar a lógica do ganho de experiência
+  }
+}
+```
+
+Você pode usar herança para criar classes que herdem as características comuns de uma classe pai e adicionem as características específicas de cada tipo de personagem. Por exemplo:
+
+```JavaScript
+// Classe filha que representa um tipo específico de personagem
+class Guerreira extends Personagem {
+  forca: number;
+  armadura: string;
+
+  constructor(nome: string, forca: number, armadura: string) {
+    super(nome); // chama o construtor da classe pai
+    this.forca = forca;
+    this.armadura = armadura;
+  }
+
+  atacar(alvo: Personagem): void {
+    // sobrescrever o método da classe pai com a lógica específica do guerreire
+  }
+
+  usarArmadura(): void {
+    // implementar a lógica do uso da armadura
+  }
+}
+```
+
+Herança é um princípio da programação orientada a objetos que permite que uma classe filha herde as propriedades e os métodos de uma classe pai, sem precisar redefinir as funções. Em Typescript, usamos a palavra-chave extends para indicar que uma classe é derivada de outra. A classe filha pode sobrescrever os métodos da classe pai se precisar de uma lógica diferente, ou adicionar novos métodos se precisar de mais funcionalidades. A classe filha também pode acessar o construtor da classe pai usando a função super.
+
+### Aula 4 - O que aprendemos?
+
+Nessa aula, você aprendeu como:
+
+- Funcionam as heranças e como elas permitem criar classes derivadas que reutilizam e estendem o código das classes bases;
+- Usar a palavra-chave extends para indicar a relação de herança entre as classes em Typescript;
+- Inserir a função super para chamar o construtor da classe base na classe derivada;
+- Sobrescrever ou adicionar métodos na classe derivada para implementar a lógica específica de cada tipo de personagem.
+
+## Aula 5 - Validando Interações
+
+### Aula 5 -  - Vídeo 1
+### Aula 5 -  - Vídeo 2
+### Aula 5 -  - Vídeo 3
+### Aula 5 -  - Vídeo 4
+### Aula 5 -  - Vídeo 5
+### Aula 5 -  - Vídeo 6
+### Aula 5 -  - Vídeo 7
+### Aula 5 -  - Vídeo 8
