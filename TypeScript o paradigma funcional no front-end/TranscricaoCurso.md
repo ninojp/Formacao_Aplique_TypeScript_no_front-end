@@ -874,10 +874,433 @@ Nessa aula, você aprendeu como:
 
 Caso queira começar daqui, você pode acessar o projeto da [aula anterior neste link](https://github.com/alura-cursos/fokus-ts/tree/aula-2). Se preferir baixar diretamente, acesse este [link para o download do arquivo zip](https://github.com/alura-cursos/fokus-ts/archive/refs/heads/aula-2.zip).
 
-### Aula 3 -  - Vídeo 1
-### Aula 3 -  - Vídeo 2
-### Aula 3 -  - Vídeo 3
-### Aula 3 -  - Vídeo 4
-### Aula 3 -  - Vídeo 5
-### Aula 3 -  - Vídeo 6
-### Aula 3 -  - Vídeo 7
+### Aula 3 - Formulário de tarefas - Vídeo 1
+
+Transcrição  
+Espero que você tenha se divertido preparando o TypeScript para esse projeto. Não se preocupe, caso haja necessidade, fornecerei detalhes sobre os passos que eu fiz, inclusive darei algumas dicas sobre o npm, git e o gitignore. Vou disponibilizar bastante conteúdo para você se aprofundar nesta área, que é a parte mais relacionada à infraestrutura do projeto.
+
+Agora, estamos prontos para dar sequência. E o próximo passo é ouvir o clique do botão "Adicionar nova tarefa". Temos um botão para adicionar nova tarefa, clicamos nele, e devemos exibir o formulário, este é o nosso próximo objetivo.
+
+Agora que eu já revelei o que acontece no final, vamos trilhar o caminho para chegar lá.
+
+No script-crud.ts, quando atualizamos a IU (interface do usuário), podemos selecionar, buscar e fazer consulta, buscando esse botão específico. Vamos fazer isso.
+
+Vamos chamar o document.querySelector(), e passamos para o querySelector() o nome da classe, o nome, o id, enfim, vamos no index.html para obter isso.
+
+O código do index.html está bastante extenso, então vamos usar o atalho "Ctrl + F" para encontrar o trecho de código do botão "Adicionar nova tarefa".
+
+```html
+    </button>
+        </footer>
+    </form>
+    <button class="app__button--add-task">
+        <img src="/imagens/add_circle.png" alt=""> Adicionar nova tarefa
+    </button>
+```
+
+Encontramos o botão, ele tem um padrão bem definido, a classe do botão é app__button--add-task, vamos pegar esse identificador e colar aqui dentro do querySelector() que estamos escrevendo no script-crud.ts.
+
+```JavaScript
+document.querySelector('.app__button--add-task')
+```
+
+O querySelector() é uma função que temos por padrão quando acessamos o document. E como eu estamos utilizando TypeScript, este já prepara essas funções para nós, e conseguimos definir os tipos. Vamos analisar mais a fundo o querySelector(), eu vou passar o mouse sobre ele para ler a explicação do que este método faz:
+
+(method) ParentNode.querySelector(selectors: string): Element | null (+4 overloads)
+
+Returns the first element that is a descendant of node that matches selectors.
+
+Ele é um método, ele espera um seletor e vai retornar um elemento ou nulo, isso significa que se eu passar um seletor que não existe, ele vai retornar nulo. Este método querySelector() é um generics, então, por exemplo,vamos guardar esse document.querySelector() em uma constante chamada btnAdicionarTarefa.
+
+```JavaScript
+const btnAdicionarTarefa = document.querySelector('.app__button--add-task')
+```
+
+Quando temos um botão e temos esse elemento selecionado, podemos fazer um elemento .onClick, que é a ação de clique do botão, e passar a função que queremos que seja executada quando este evento ocorrer. Portanto, podemos chamar esse btnAdicionarTarefa e definir o evento .onClick.
+
+```JavaScript
+const btnAdicionarTarefa = document.querySelector('.app__button--add-task')
+
+btnAdicionarTarefa.onclick
+```
+
+Mas o VS Code indica que o onClick não existe em elemento, por ser um elemento genérico. É preciso informar ao TypeScript que este elemento é um botão, que possui o evento de click. Como o querySelector() usa generics, e nós já sabemos qual é o tipo, vamos usar e abusar desse poder do TypeScript.
+
+No document.querySelector, vamos acrescentar o generics indicando que este elemento é um HTMLButtonElement.
+
+```JavaScript
+const btnAdicionarTarefa = document.querySelector<HTMLButtonElement>('.app__button--add-task')
+
+btnAdicionarTarefa.onclick
+```
+
+Agora, ao verificarmos qual é o tipo do btnAdicionarTarefa, colocando o cursor do mouse sobre ele, ele é HTMLButtonElement ou nulo. Ele indica que o btnAdicionarTarefas possivelmente é nulo. Então, precisamos tratar isso, podemos utilizar um if para verificar se ele existe, mas também podemos tratar esses erros e fornecer mensagens de erro personalizadas, facilitando nosso trabalho, ou o trabalho de qualquer outra pessoa desenvolvedora no futuro.
+
+Vamos utilizar um if, vou pedir ao VS Code para preencher automaticamente. Então, a condição é: se não temos o btnAdicionarTarefas, vamos lançar um erro. Esse erro é conhecido, eu não espero que nesse momento da aplicação esse elemento não exista. Se ele não existir, algo foi alterado no código, ou a classe foi trocada, ou o elemento foi removido.
+
+Essa dica vai ajudar a pessoa desenvolvedora a entender o que aconteceu.Vamos lançar um erro com uma mensagem amigável, "Caro colega, o elemento btnAdicionarTarefas não foi encontrado. Favor revisar":
+
+```JavaScript
+    if (!btnAdicionarTarefa) {
+        throw Error("Caro colega, o elemento btnAdicionarTarefa não foi encontrado. Favor rever.")
+    }
+
+    btnAdicionarTarefa.onclick
+```
+
+O que fizemos aqui é programação defensiva, ou seja, estamos tratando as condições. Agora, se esse elemento for nulo por algum acaso, não será um erro genérico e sim uma mensagem explicativa do que aconteceu. O erro que o TypeScript apontava sobre o btnAdicionarTarefas possivelmente ser nulo já não existe mais, pois se ele for nulo, já lançamos um erro e não avançamos para a linha 55.
+
+Agora estamos jogando de forma segura, e se ocorrer de esse elemento não existir na tela, a mensagem que aparecerá será: 'Caro colega, o elemento btnAdicionarTarefa não foi encontrado.' Podemos aperfeiçoar isso, indicando qual é a classe, entre outras coisas. Use sua criatividade para deixar claro o que aconteceu.
+
+Adicionar função onCLick  
+Nosso próximo passo é adicionar uma função nesse onclick. Vamos passar uma arrow function e, quando alguém clica nesse botão, o que queremos fazer é alternar a classe do formulário. No HTML, o form tem a classe app__form-add-task e uma classe hidden para escondê-lo. Então, no click desse botão, queremos alternar essa classe: se já tem, remove; se não tem, adiciona.
+
+Vamos precisar de mais um seletor, o app__form-add-task. Assim, faremos a busca dos elementos e também vamos buscar esse form.
+
+```JavaScript
+    const ulTarefas = document.querySelector('.app__section-task-list')
+    const formAdicionarTarefa = document.querySelector<HTMLFormElement>('.app__form-add-task')
+    const btnAdicionarTarefa = document.querySelector<HTMLButtonElement>('.app__button--add-task')
+
+    if (!btnAdicionarTarefa) {
+        throw Error("Caro colega, o elemento btnAdicionarTarefa não foi encontrado. Favor rever.")
+    }
+
+    btnAdicionarTarefa.onclick = () => {
+        
+    }
+```
+
+Repare que estou sempre incluindo um prefixo indicando que tipo de elemento é (form, btn, ul).
+
+Para tornar nosso código mais compreensível e deixar o VSCode orgulhoso de nós, é importante que utilizemos as funções disponíveis da melhor forma.
+
+Uma vez que nós indicamos que esse elemento é um formulário, teremos acesso a um Intellisense, ao autocomplete, e a todas as funcionalidades que um formulário pode oferecer.
+
+Vamos terminar de escrever a arrow function
+
+```JavaScript
+    btnAdicionarTarefa.onclick = () => {
+        formAdicionarTarefa?.classList.toggle('hidden')
+    }
+```
+
+Essa função toggle nos permitirá alternar entre as opções. Se a classe já possui um elemento, o método toggle o removerá; se a classe não possui o elemento, ele será adicionado. O termo hidden é um termo em inglês que significa "oculto".
+
+Pronto. Podemos salvar e testar nosso código. Vamos executar o watch - tsconfig.json. Ele compilou e não encontrou erros.
+
+Podemos acessar o navegador e recarregar a página da aplicação.
+
+Ao clicar no botão "Adicionar nova tarefa", ele exibe o formulário. Se clicarmos novamente no botão, ele esconde o formulário.
+
+Agora, vamos verificar se a mensagem de erro que criamos está funcionando. No código de script-crud.ts, vamos remover a letra 'K' do seletor app__button--add-task e verificar o que ocorre.
+
+Ele compilou de novo, vamos recarregar a página no navegador. Ao recarregarmos a página novamente, recebemos uma mensagem de erro no console informando que o elemento btnAdicionarTarefa não foi encontrado. Ele nos diz onde encontrar o erro: "isso ocorreu na script-crud.js, na linha 36".
+
+Em vez de receber um erro genérico, típico por tentar fazer uma atribuição que vai gerar um erro de indefinição, se receberá um erro bem amigável. Isso mostra a nossa consideração não apenas com nosso eu do futuro, mas também com a próxima pessoa desenvolvedora que vai trabalhar aqui.
+
+Agora, para corrigir o erro, vamos adicionar o 'K' em app__button--add-task , e verificaremos novamente no navegador se foi corrigido. Ótimo! Está tudo funcionando como deveria.
+
+Com isso feito, estamos prontos para o próximo passo: adicionar a nova tarefa.
+
+### Aula 3 - Adicionando tarefas - Vídeo 2
+
+Transcrição  
+Agora que nós já temos acesso ao formulário, precisamos ouvir o evento de submissão desse elemento e, quando o formulário for submetido, pegaremos o texto da área de texto e adicionaremos essa tarefa nova como não concluída. Vamos lá!
+
+Em nosso script-crud.ts, vamos adicionar a busca por mais um elemento, o textArea. Este elemento recebe o document.querySelector. Verificamos no index.html que a classe dele é app__form-textarea.
+
+```JavaScript
+const ulTarefas = document.querySelector('.app__section-task-list')
+    const formAdicionarTarefa = document.querySelector<HTMLFormElement>('.app__form-add-task')
+    const btnAdicionarTarefa = document.querySelector<HTMLButtonElement>('.app__button--add-task')
+    const textarea = document.querySelector<HTMLTextAreaElement>('.app__form-textarea')
+```
+
+Agora que temos nossa base, temos acesso ao formulário para ouvir o submit e temos acesso à text area para pegar o valor que foi digitado. Vamos colocar após o nosso if, btnAdicionarTarefa.onclick, podemos fazer o formAdicionarTarefas.onsubmit. Vamos atribuir um valor, que é uma arrow function.
+
+```JavaScript
+if (!btnAdicionarTarefa) {
+        throw Error("Caro colega, o elemento btnAdicionarTarefa não foi encontrado. Favor rever.")
+    }
+
+    btnAdicionarTarefa.onclick = () => {
+        formAdicionarTarefa?.classList.toggle('hidden')
+    }
+
+    formAdicionarTarefa.onsubmit = () => {
+        
+    }
+```
+
+O VS Code está informando novamente que o formAdicionarTarefa pode ser nulo. Podemos tratar, assim como fizemos para o btnAdicionarTarefa, ou podemos dar uma de sabichão e dizer: "Olha só, TypeScript, confia em mim, que esse elemento vai existir. Eu sei o que estou fazendo, estou ciente de que esse formulário vai existir". Então, vamos adicionar uma exclamação ao formAdicionarTarefa.onsubmit para indicar isso. Quando colocamos a exclamação estamos afirmando que esse elemento existe.
+
+No onsubmit, recebemos por argumento um evento. Quando estamos controlando algo somente do lado do front-end, não enviará nada para lugar nenhum, o evento de submissão do formulário vai recarregar a página.
+
+Então o que fazemos? Pegamos esse evento e fazemos um .preventDefault. Ou seja, não temos o comportamento padrão de recarregar a página. Ele fará a submissão e ficará quietinho, que é exatamente o que queremos.
+
+```JavaScript
+    formAdicionarTarefa!.onsubmit = (evento) => {
+        evento.preventDefault()
+        
+    }
+```
+
+Por último, o que queremos? Pegar o valor da descrição da tarefa. Então const descricao receberá o nosso textarea.value.
+
+```JavaScript
+    formAdicionarTarefa!.onsubmit = (evento) => {
+        evento.preventDefault()
+        const descricao = textarea?.value
+                
+    }
+```
+
+Agora o que devemos fazer é dizer que o nosso estadoInicial vai receber o retorno de uma função, que será adicionarTarefa(). Esta função terá que ser pura, então ela vai receber estadoInicial como parâmetro e vai receber a nova tarefa.
+
+E que tarefa é essa? Vamos criar um novo objeto. Vamos passar a descrição, que já capturamos, e diremos que a tarefa está concluída ou não. Agora sim, falso. Ou seja, ela não está concluída ainda.
+
+Quando isso terminar, devemos chamar a função atualizarUI.
+
+```JavaScript
+    if (!btnAdicionarTarefa) {
+        throw Error("Caro colega, o elemento btnAdicionarTarefa não foi encontrado. Favor rever.")
+    }
+
+    btnAdicionarTarefa.onclick = () => {
+        formAdicionarTarefa?.classList.toggle('hidden')
+    }
+
+    formAdicionarTarefa!.onsubmit = (evento) => {
+        evento.preventDefault()
+        const descricao = textarea?.value
+        estadoInicial = adicionarTarefa(estadoInicial, {
+            descricao,
+            concluida: false
+        })
+        atualizarUI()
+    }
+```
+
+O VS Code já está acusando um erro, está dizendo que não tem ideia do que é adicionarTarefa. Vamos implementá-lo agora. Copiaremos o nome da função e a definiremos no começo do código, onde estamos definindo nossas funções. Vamos escrever abaixo do bloco de selecionarTarefa:
+
+```JavaScript
+const adicionarTarefa = (estado: EstadoAplicacao, tarefa: Tarefa)
+```
+
+Portanto, tem a mesma assinatura do nosso selecionarTarefa. Ele recebe um estado e uma tarefa. Agora, faremos o que precisa ser feito. Vamos garantir nosso retorno, que é EstadoAplicacao. Farei o mesmo esquema usando return. Criamos um novo objeto. Fazendo o spread do estado, que é tudo o que já tinha. O que queremos sobrescrever são as nossas tarefas.
+
+```JavaScript
+const adicionarTarefa = (estado: EstadoAplicacao, tarefa: Tarefa) : EstadoAplicacao => {
+    return {
+        ...estado,
+        tarefas:
+    }
+}
+```
+
+O que serão as nossas novas tarefas?
+
+Vamos pegar o nosso estado anterior, chamar nossa tarefas. Existem várias formas de fazer isso, vamos usar uma que acho bem legal. Farei o seguinte: criarei um novo array passando as tarefas que já existiam. Fazendo um spread operator das tarefas. Além das que já existiam, passarei a nova.
+
+```JavaScript
+const adicionarTarefa = (estado: EstadoAplicacao, tarefa: Tarefa) : EstadoAplicacao => {
+    return {
+        ...estado,
+        tarefas: [...estado.tarefas, tarefa]
+    }
+}
+```
+
+Veja o que fiz: retornei o meu estado, alterando apenas a parte de tarefas. O restante do estado que existia, eu não alterei. Foi por isso que usei o spread.
+
+Então, adicionamos a nova tarefa. Vamos ver se tem algo dando errado no código do formAdicionarTarefa!.onsubmit.
+
+Ele está exibindo um erro na descricao. Veja só, ele está falando que a descrição, que está como string ou undefined, não funciona aqui, porque estamos esperando uma string.
+
+De novo, por que estamos esperando uma string? Porque o text area é nulo ou é um text area element. Podemos fazer o mesmo, tratar todos os elementos, ou podemos nos assegurar, dizendo: não se preocupe, esse text area existe, pode confiar. Vamos adicionar uma exclamação após o textarea.
+
+```JavaScript
+    if (!btnAdicionarTarefa) {
+        throw Error("Caro colega, o elemento btnAdicionarTarefa não foi encontrado. Favor rever.")
+    }
+
+    btnAdicionarTarefa.onclick = () => {
+        formAdicionarTarefa?.classList.toggle('hidden')
+    }
+
+    formAdicionarTarefa!.onsubmit = (evento) => {
+        evento.preventDefault()
+        const descricao = textarea!.value
+        estadoInicial = adicionarTarefa(estadoInicial, {
+            descricao,
+            concluida: false
+        })
+        atualizarUI()
+    }
+```
+
+Fizemos muitas coisas aqui. Vamos garantir que o TS está sendo compilado. Atualizarei a página no navegador. Não tem nenhum erro sendo exibido no console, o que já me tranquiliza.
+
+Clicarei em "Adicionar nova tarefa" e escreverei "Estudar Angular". Clicarei em "Salvar". Perfeito, ele adicionou a nossa tarefa na lista de tarefas!
+
+Então, atingimos o nosso primeiro objetivo: ouvir o evento de submit, pegar o valor da text area e adicionar na nossa lista de tarefas.
+
+No próximo vídeo, saberemos qual é a próxima missão.
+
+### Aula 3 - Selecionando e preparando edição - Vídeo 3
+
+Transcrição  
+Já conseguimos adicionar novas tarefas, portanto, precisamos continuar evoluindo para finalizar o nosso CRUD. O próximo passo é selecionar uma tarefa. Há alguns conceitos relacionados a esse processo e algumas etapas nós faremos juntos. No final, teremos uma parte legal e, desta vez, não darei spoilers.
+
+O que precisamos fazer?
+
+Quando alguém clicar no elemento de lista, precisamos selecionar essa tarefa. Isso envolverá algumas operações. Teremos que destacar, então tem que adicionar uma classe quando a tarefa estiver selecionada. Além disso, se a pessoa usuária clicar no aplicativo para editar, precisamos preencher o valor da text area.
+
+Vamos começar a executar essas tarefas, reiterando somente que estamos reforçando os conteúdos e continuando nossa programação defensiva. Por vezes, essa programação se torna um pouco mais agressiva quando utilizamos o sinal de exclamação.
+
+No VS Code, retomando a programação em nosso arquivo script-crud.ts – fique sempre atento à extensão do arquivo para não editar o JS sem querer – , na linha 81 temos um laço forEach nos itens de tarefa para acrescentar os elementos na lista.
+
+```JavaScript
+estadoInicial.tarefas.forEach(tarefa => {
+ 
+// código omitido
+```
+
+Temos aqui o item da lista e o que queremos agora é ouvir pelo evento de clique. Então, antes de realizar o appendChild em nossa lista de tarefas, no nosso li, vamos chamar a função addEventListener. Essa função será executada sempre que esse evento acontecer.
+
+O primeiro parâmetro desse método é o tipo de evento. O VS Code, que é um grande aliado, nos oferece a lista de eventos que temos disponíveis, e o que queremos ouvir especificamente é o "click". O segundo parâmetro é a ação que será executada quando o evento ocorrer.
+
+```JavaScript
+    li.appendChild(svgIcon)
+    li.appendChild(paragraph)
+    li.appendChild(button)
+
+    li.addEventListener('click', () => {
+        
+    }
+```
+
+Nesse caso, queremos selecionar a tarefa. Essa função foi implementada anteriormente, quando discutíamos sobre funções puras. Assim, chamarei aqui a função de selecionar tarefas. Essa função espera receber a tarefa que foi selecionada e o estado atual. Então, passo o estado inicial e a tarefa.
+
+Note que eu passo a tarefa porque, dentro do laço for, eu tenho acesso a ela, a referência para essa tarefa dentro da minha lista. Portanto, consigo selecioná-la.
+
+No entanto, há um pequeno detalhe que é importante: essa função selecionarTarefas retorna o estado. Portanto, precisamos atribuir esse retorno ao nosso estadoInicial. Se esquecermos disso, a tarefa é adicionada a um objeto novo e nada será atualizado, dando a impressão de que há um bug no código.
+
+Depois de selecionado o estado inicial, é preciso atualizar nossa interface de usuário completamente.
+
+```JavaScript
+    li.appendChild(svgIcon)
+    li.appendChild(paragraph)
+    li.appendChild(button)
+
+    li.addEventListener('click', () => {
+        estadoInicial = selecionarTarefa(estadoInicial, tarefa)
+        atualizarUI()
+    })
+```
+
+Para confirmar que o clique foi efetuado, incluirei aqui um console.log(). A mensagem que passarei será "a tarefa foi clicada" junto com o objeto da tarefa, para sabermos o que foi clicado.
+
+```JavaScript
+    li.addEventListener('click', () => {
+        console.log('A tarefa foi clicada', tarefa)
+        estadoInicial = selecionarTarefa(estadoInicial, tarefa)
+        atualizarUI()
+    })
+```
+
+Podemos salvar e conferir se o watch está rodando.
+
+Vamos acessar o navegador e recarregar a página. E clicar em uma das tarefas listadas. Apareceu no console a seguinte mensagem:
+
+A tarefa foi clicada {descricao: 'Tarefa concluída', concluída: true}
+
+Está funcionando. Então, o que precisamos fazer agora?
+
+Na nossa função que atualiza a UI, se a tarefa selecionada for igual a tarefa da vez, precisaremos adicionar uma classe.
+
+Além disso, há algumas coisas que precisamos fazer para finalizar o nosso CRUD. Como é o momento de praticarmos ainda mais os conceitos que vimos até agora, de função pura, de manipulação de elementos com tipagem forte, o próximo passo para finalizar esse CRUD será efetuado por você, por isso, conto com a sua colaboração.
+
+Desafio  
+A ideia deste desafio é aprimorar o Fokus para que tenha todas as operações do CRUD.
+
+O que você precisará fazer? Quando selecionar a tarefa, no texto de título "em andamento", você deverá atualizar o título da tarefa em questão.
+
+Além disso, se clicar no ícone de lápis para editar essa tarefa, deve abrir o formulário e atualizar o valor do text area. Ao salvar o text area, deve atualizar a lista de tarefas. Se cancelar, fecha sem fazer nenhuma alteração, mas se deletar, remova a tarefa da lista. Entendido?
+
+É bastante coisa para fazer, mas são conceitos que já estudamos aqui: funções puras e manipulação de elementos com tipagem forte.
+
+A sua estratégia pode ser mais defensiva, tratando com if's se os elementos existem, ou mais ofensiva, colocando diretamente uma exclamação e declarando que você confirma que o elemento existe.
+
+Caso necessite, não se preocupe, disponibilizarei um gabarito para você entender como eu fiz essas operações do CRUD.
+
+Quando concluir, poste no fórum, no Discord, no LinkedIn, marque-me e mostre-me como finalizou o CRUD do Fokus.
+
+Na próxima aula, vamos aprender algo muito interessante relacionado a eventos customizados do JavaScript. Então, fica o spoiler e o desafio para você. Te espero na próxima aula.
+
+### Aula 3 - Desafio: finalizando o CRUD
+
+Agora é a hora de praticar e consolidar o conhecimento adquirido. A sua missão, se decidir aceitá-la, é finalizar todas as operações do CRUD de tarefas.
+
+Opinião do instrutor
+
+Então, como foi o percurso?
+
+Durante o curso eu separei os commits do projeto de acordo com as aulas.
+
+[Nesse link](https://github.com/alura-cursos/fokus-ts/commit/efb1f343233d7fe4139069df99038c890ca3b5d5?diff=split) Você consegue ver exatamente as alterações que eu fiz utilizando essa interface do Github.
+
+### Aula 3 - Transformando funções JavaScript em funções puras TypeScript
+
+Você é um programador(a) experiente em TypeScript e acaba de ingressar em uma nova equipe de desenvolvimento, onde há um(a) programador(a) que está iniciando na linguagem. Ambos estão trabalhando juntos no front-end de um novo projeto web. Durante a programação em par, você se depara com o seguinte trecho de código em JavaScript, escrito pelo seu colega:
+
+```JavaScript
+function addItem(name, price) {
+    let product = {};
+    product.name = name;
+    product.price = price;
+    document.getElementById("products").innerHTML += `<p>${product.name}: ${product.price}</p>`;
+    return product;
+}
+```
+
+Você decide que esse código pode ser refatorado para TypeScript, também visando utilizar conceitos de função pura para a manipulação do DOM.
+
+Pergunta: Como você transformaria essa função JavaScript em uma função TypeScript pura?
+
+Selecione uma alternativa
+
+Resposta:
+
+```JavaScript
+function addItem(name: string, price: number): string {
+    let product = { name, price };
+    return `<p>${product.name}: ${product.price}</p>`;
+}
+```
+
+> O código foi refatorado para TypeScript e a função se tornou pura, apenas retornando uma string que pode ser usada para manipular o DOM.
+
+### Aula 3 - O que aprendemos?
+
+Nessa aula, você aprendeu como:
+
+- Interação entre a lógica de estados e a UI: Como o estado estadoInicial e as funções selecionarTarefa e adicionarTarefa se integram com a função atualizarUI para refletir mudanças na interface do usuário.
+
+- Manipulação de eventos na UI: Implementação de interações do usuário, como o clique no botão para adicionar uma tarefa e a seleção de uma tarefa, e como essas interações desencadeiam atualizações no estado e na UI.
+
+- Dinâmica de adição de tarefas: Como o formulário e os elementos relacionados são usados para adicionar uma nova tarefa ao estado e, posteriormente, atualizar a lista de tarefas na interface.
+
+Feedback visual para tarefas concluídas: Uso de classes e atributos para alterar a aparência visual de tarefas com base em seu status de conclusão, tornando a interface intuitiva.
+
+## Aula 4 - Refatoração e ajustes finais
+
+### Aula 4 -  - Vídeo 1
+### Aula 4 -  - Vídeo 2
+### Aula 4 -  - Vídeo 3
+### Aula 4 -  - Vídeo 4
+### Aula 4 -  - Vídeo 5
+### Aula 4 -  - Vídeo 6
+### Aula 4 -  - Vídeo 7
+### Aula 4 -  - Vídeo 8

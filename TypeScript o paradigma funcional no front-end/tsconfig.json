@@ -5,6 +5,7 @@
         "target": "es2024",
         "noEmitOnError": true,
         "noImplicitAny": true,
+        "removeComments": true,
         "strict": true,
         "strictNullChecks": true,
         "experimentalDecorators": true,
