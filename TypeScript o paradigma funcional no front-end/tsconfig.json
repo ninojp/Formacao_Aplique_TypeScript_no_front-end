@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+        "outDir": "./dist",
+        "rootDir": "./src",
+        "target": "es2024",
+        "noEmitOnError": true,
+        "noImplicitAny": true,
+        "strict": true,
+        "strictNullChecks": true,
+        "experimentalDecorators": true,
+        "forceConsistentCasingInFileNames": true
+    },
+    "include": ["./src/**/*"]
+}
+//"removeComments": true,

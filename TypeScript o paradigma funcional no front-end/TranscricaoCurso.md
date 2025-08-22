@@ -420,6 +420,7 @@ Para descobrir qual seletor utilizar, vamos até o arquivo index.html e procurar
 
 index.html:
 
+```JavaScript
 <ul class="app__section-task-list"></ul>
 ```
 
@@ -429,6 +430,7 @@ Sabendo qual seletor utilizar, teremos o seguinte código:
 
 script-crud.ts:
 
+```JavaScript
 const atualizarUI = () => {
     const ulTarefas = document.querySelector('.app__section-task-list')
 }
@@ -436,6 +438,7 @@ const atualizarUI = () => {
 
 A primeira coisa que queremos fazer é limpar o conteúdo do innerHTML da ulTarefas, independentemente do estado anterior, atribuindo a ulTarefas?.innerHTML uma string vazia.
 
+```JavaScript
 const atualizarUI = () => {
     const ulTarefas = document.querySelector('.app__section-task-list')
     ulTarefas?.innerHTML = ''
@@ -450,6 +453,7 @@ Com isso, o VS Code já facilita nossa vida ao inserir a interrogação, sinaliz
 
 Para tratar isso, vamos adicionar um bloco condicional para verificar se a lista de tarefas ulTarefas existe. Se sim, fazemos a limpeza do innerHTML. Dessa forma, nem o VS Code nem o TypeScript retornam erros.
 
+```JavaScript
 const atualizarUI = () => {
     const ulTarefas = document.querySelector('.app__section-task-list')
     if (ulTarefas) {
@@ -458,9 +462,10 @@ const atualizarUI = () => {
 }
 ```
 
-Conclusão
+Conclusão  
 O próximo passo é lidar com a atualização da interface com base no estado. A função atualizarUI() não é pura. Então, vamos abrir o estadoInicial, buscar dentro dele a lista de tarefas (tarefas), e para cada tarefa (forEach()), vamos recriar o elemento, levando em consideração todas as características que precisamos: se a tarefa está concluída, se não está, se está selecionada ou não.
 
+```JavaScript
 const atualizarUI = () => {
     const ulTarefas = document.querySelector('.app__section-task-list')
     if (ulTarefas) {
@@ -477,10 +482,10 @@ Vamos começar a construir esse HTML considerando tudo o que aprendemos até ago
 
 ### Aula 2 - Interação com a UI - Vídeo 2
 
-Transcrição
+Transcrição  
 Já estamos prontos para escrever um pouco de manipulação do DOM e trazer a criação de um item de lista, ou seja, de uma tarefa, para a função atualizarUI().
 
-Interação com a UI
+Interação com a UI  
 Parte do código será bem similar. Dito isso, como evitar a duplicação de código?
 
 Com o arquivo script-crud.js aberto, vamos colapsar a aba "Explorer" com o atalho "Ctrl + B" e deixar lado a lado o script-crud.js e o script-crud.ts, para comparar e entender o que pode ser aproveitado. Se precisarmos de alguma alteração, faremos conforme necessário.
@@ -491,6 +496,7 @@ A primeira coisa que fazemos na linha 103 do arquivo .js é criar uma lista (li)
 
 script-crud.js:
 
+```JavaScript
 function createTask(tarefa) {
     const li = document.createElement('li')
 
@@ -501,6 +507,7 @@ Vamos criar esse elemento copiando a linha do arquivo .js e colando no arquivo .
 
 Na sequência, a função adiciona uma classe ao mesmo elemento da lista.
 
+```JavaScript
 li.classList.add('app__section-task-list-item')
 ```
 
@@ -508,6 +515,7 @@ Também traremos isso para o arquivo .ts.
 
 script-crud.ts:
 
+```JavaScript
 const atualizarUI = () => {
     const ulTarefas = document.querySelector('.app__section-task-list')
     if (ulTarefas) {
@@ -525,6 +533,7 @@ Em seguida, a função cria um SVG (svgIcon) e atribui a svgIcon.innerHTML o val
 
 script-crud.js:
 
+```JavaScript
 const svgIcon = document.createElement('svg')
 svgIcon.innerHTML = taskIconSvg
 ```
@@ -533,6 +542,7 @@ Iremos transpor essas duas linhas para o arquivo .ts e ajustar a identação. O 
 
 No arquivo .js, identificamos que ele está definido entre as linhas 31 e 39.
 
+```JavaScript
 const taskIconSvg = `
 <svg class="app__section-task-icon-status" width="24" height="24" viewBox="0 0 24 24"
     fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -548,6 +558,7 @@ Vamos copiar este trecho e colar logo após atualizarUI(), antes da declaração
 
 script-crud.ts:
 
+```JavaScript
 const atualizarUI = () => {
     const taskIconSvg = `
         <svg class="app__section-task-icon-status" width="24" height="24" viewBox="0 0 24 24"
@@ -579,6 +590,7 @@ Nós já criamos o item de lista, adicionamos a classe, criamos o ícone SVG, e 
 
 script-crud.js:
 
+```JavaScript
 const paragraph = document.createElement('p')
 paragraph.classList.add('app__section-task-list-item-description')
 paragraph.textContent = tarefa.descricao
@@ -588,6 +600,7 @@ Dessa forma, criamos o parágrafo. Agora podemos transpor as duas próximas cons
 
 Vamos copiar da linha 113 à 119 e trazer para o arquivo script-crud.ts.
 
+```JavaScript
 const button = document.createElement('button')
 button.classList.add('app_button-edit')
 
@@ -601,6 +614,7 @@ A parte de adicionar o ouvinte do evento (addEventListener()), que aparece na se
 
 Na linha 136 do código .js, temos o bloco condicional if (tarefa.concluida). Podemos trazer este trecho também para o código .ts.
 
+```JavaScript
 if (tarefa.concluida) {
     button.setAttribute('disabled', true)
     li.classList.add('app__section-task-list-item-complete')
@@ -609,6 +623,7 @@ if (tarefa.concluida) {
 
 Resultado do bloco forEach() no arquivo script-crud.ts até o momento:
 
+```JavaScript
 estadoInicial.tarefas.forEach(tarefa => {
     const li = document.createElement('li')
     li.classList.add('app__section-task-list-item')
@@ -642,6 +657,7 @@ Logo, nesse cenário em que passamos um atributo, apesar de ser booleano, precis
 
 script-crud.ts:
 
+```JavaScript
 if (tarefa.concluida) {
     button.setAttribute('disabled', 'true')
     li.classList.add('app__section-task-list-item-complete')
@@ -656,6 +672,7 @@ Por fim, no arquivo .js, tudo isso é reunido e inserimos o ícone SVG (svgIcon)
 
 script-crud.js:
 
+```JavaScript
 li.appendChild(svgIcon)
 li.appendChild(paragraph)
 li.appendChild(button)
@@ -669,8 +686,8 @@ O que vamos fazer é pegar a lista não ordenada de tarefas (ulTarefas) que já 
 
 Resultado do arquivo script-crud.ts:
 
+```JavaScript
 // código omitido
-
 const atualizarUI = () => {
     const taskIconSvg = `
         <svg class="app__section-task-icon-status" width="24" height="24" viewBox="0 0 24 24"
@@ -724,22 +741,143 @@ Alguns detalhes: primeiramente, o VS Code é um grande aliado e insere uma inter
 
 No contexto do bloco if da linha 48, queríamos escrever algo dentro de ulTarefas, e se essa lista fosse nula, quebraria a aplicação. Já no cenário da linha 81, se a lista de tarefas não existir, ele não tentará chamar a função. Logo, se isso acontecer, ao testar a aplicação, não encontraremos o item de lista.
 
-Testando o código
+Testando o código  
 Para finalizar este momento, podemos salvar o arquivo script-crud.ts e testar o código em execução. Realizaremos dois pequenos passos:
 
-No primeiro, precisamos definir para o projeto o TSConfig, determinando quão rígidas ou quão flexíveis serão as regras do nosso compilador;
-Feito disso, precisamos configurar para que, após a compilação, ele sobrescreva o arquivo script-crud.js. Dessa forma, conforme salvamos o arquivo, o arquivo .js correspondente sempre será sobrescrito.
+- No primeiro, precisamos definir para o projeto o TSConfig, determinando quão rígidas ou quão flexíveis serão as regras do nosso compilador;
+- Feito disso, precisamos configurar para que, após a compilação, ele sobrescreva o arquivo script-crud.js. Dessa forma, conforme salvamos o arquivo, o arquivo .js correspondente sempre será sobrescrito.
+
 Agora é a sua vez de brilhar!
 
-Conclusão
+Conclusão  
 Uma dica que podemos dar é que há um curso anterior da Alura, com o instrutor João Vitor, no qual ele explora essa temática do início. Se você ainda não assistiu, recomendamos bastante e você poderá aplicar os conhecimentos no projeto Fokus.
 
 Portanto, deixaremos essa missão para você! Caso precise de ajuda, haverá um gabarito para você se referenciar, mas a ideia é que você pratique. É por meio da prática que conseguimos absorver esse tipo de conhecimento, e configurar a forma como o TypeScript constrói um projeto é uma parte muito importante do nosso dia a dia enquanto pessoas desenvolvedoras de front-end.
 
-### Aula 2 -  - Vídeo 3
-### Aula 2 -  - Vídeo 4
-### Aula 2 -  - Vídeo 5
-### Aula 2 -  - Vídeo 6
-### Aula 2 -  - Vídeo 7
-### Aula 2 -  - Vídeo 8
-### Aula 2 -  - Vídeo 9
+### Aula 2 -  Para saber mais: CSS e o padrão BEM
+
+Salve o/!
+
+No nosso profundo mergulho em TypeScript funcional, você pode estar se perguntando: "Por que estamos falando sobre CSS?". Bom, como sabemos, para construir aplicações frontend eficazes, não basta apenas dominar a lógica e os padrões de design - a estilização é uma parte crucial da experiência do usuário. E quando falamos de estilização, um padrão que ganhou bastante tração e pode ajudar muito na manutenção e escalabilidade é o BEM. Então, bora lá entender esse padrão?
+
+O que é BEM?  
+BEM significa Block, Element, Modifier. É uma metodologia que fornece uma convenção para nomear classes em CSS, tornando seu código mais legível e compreensível.
+
+- Block: É uma entidade independente e significativa por si só. Exemplo: header, container, menu.
+
+- Element: Partes de um bloco que têm significado em conjunto com esse bloco. Exemplo: menu__item, header__logo.
+
+- Modifier: Uma variação ou extensão de um bloco ou elemento. Exemplo: menu--hidden, menu__item--active
+
+Por que usar BEM?  
+Legibilidade: Olhando para uma classe BEM, você pode facilmente entender a relação entre o CSS e o HTML, o que está acontecendo e onde.
+
+Independência: Os blocos são independentes e podem ser reutilizados, sem estar atrelados a outros elementos.
+
+Sem Cascata: Como o BEM evita a especificidade, os estilos não se sobrepõem, evitando efeitos colaterais indesejados.
+
+Casos de uso comuns no frontend:  
+Componentização: Pense nos componentes como blocos. Quando criamos componentes em frameworks como React, Vue ou Angular, o padrão BEM pode ser facilmente aplicado para manter a consistência de estilização.
+
+Manutenção e Escalabilidade: Suponha que você está trabalhando em uma equipe grande, onde múltiplos desenvolvedores tocam na base de código. Com o BEM, cada pessoa pode entender e identificar rapidamente a estrutura e relação entre HTML e CSS, sem medo de quebrar estilos existentes.
+
+```html
+<div class="card">
+    <img src="..." alt="..." class="card__image">
+    <h2 class="card__title">Título</h2>
+    <p class="card__description">Descrição aqui.</p>
+    <button class="card__button card__button--primary">Clique Aqui</button>
+</div>
+```
+
+Note como, mesmo sem ver o CSS, você tem uma ideia clara da estrutura e das relações.
+
+Agora, você pode estar pensando, "Tá, entendi o BEM, mas e o TypeScript?". A realidade é que, enquanto TypeScript se concentra na lógica e na estrutura, o BEM se preocupa com a estilização. Quando ambos são aplicados corretamente, você acaba com um código frontend robusto, manutenível e altamente legível.
+
+Esse assunto é tão bacana que que o [Mario Souto escreveu esse artigo](https://www.alura.com.br/artigos/criando-componentes-css-com-padrao-bem) mega bacana sobre ele.
+
+Vida longa e próspera! 🖖
+
+### Aula 2 - Desafio: compilando TS
+
+Chegou a sua vez de preparar o projeto. Você vai precisar iniciar um projeto usando o NPM. Além disso, é a hora de instalar o typescript como dependencia de desenvolvimento.
+
+Por fim, defina o tsconfig.json. Assim você vai estar pronto para seguir os estudos.
+
+Opinião do instrutor
+
+Então, como foi o percurso?
+
+Vou deixar [aqui a documentação do NPM init](https://docs.npmjs.com/cli/v9/commands/npm-init) se você quiser entender melhor como ele funciona.
+
+Pra gente, basta abrir o terminal na pasta do projeto e rodar o comando:
+
+> npm ini -y
+
+Assim, teremos o projeto iniciado com o package.json devidamente configurado. Agora já podemos instalar o TypeScript:
+
+> npm i typescript
+
+Agora basta usar o compilador do próprio VSCode.
+
+Versionamento e Git  
+Caso você ainda não conheça o Github e o que é versionamento de código, eu super [indico esse curso](https://cursos.alura.com.br/course/git-github-repositorio-commit-versoes) pra você ficar por dentro do assunto.
+
+Se você já conhece e quer preparar o versionamento do projeto Fokus no Github, podemos aproveitar para preparar o arquivo .gitignore.
+
+Imagina que você está organizando sua mochila para uma viagem e quer levar apenas o essencial. O .gitignore é tipo a sua checklist do que NÃO colocar na mala. É uma maneira do Git saber o que deve e o que não deve rastrear ou, em outras palavras, o que não deve ser incluído em seu repositório.
+
+Agora, falando sobre o node_modules, essa é uma daquelas pastas pesadonas, recheada de arquivos! Quando estamos desenvolvendo projetos de frontend, essa pasta guarda todas as bibliotecas e dependências que nosso projeto precisa. Mas por que não queremos ela no nosso Git? Primeiro, porque ela é ENORME! Adicionar isso ao nosso repositório iria sobrecarregá-lo desnecessariamente. Segundo, todos esses pacotes já estão listados no package.json, ou seja, qualquer pessoa que pegar seu projeto pode simplesmente rodar um npm install e... voilà! Todos os pacotes serão baixados, sem precisar armazená-los no Git.
+
+Então, sempre que pensar no node_modules, lembre-se: não é só sobre economizar espaço. É sobre manter nosso repositório limpo, organizado e focado apenas no código que realmente importa para a nossa aplicação.
+
+Além disso, a versão do Node e o próprio sistema operacional podem requerer instalações customizadas. Então, fique sempre de olho!
+
+### Aula 2 - Usando TypeScript para manipular o DOM - Exercício
+
+Durante seu treinamento como um(a) desenvolvedor(a) Jedi, você está aprendendo TypeScript - um poderoso aliado no universo do front-end. Seu mestre, Yoda, deu-lhe a tarefa de refatorar uma função JavaScript que manipula o DOM para TypeScript. A função original está especificada abaixo:
+
+```JavaScript
+function ativarSabreDeLuz(cor) {
+    document.getElementById('sabreDeLuz').style.backgroundColor = cor;
+}
+```
+
+Sua missão é assegurar que a função ativarSabreDeLuz receba apenas strings como argumentos, de modo a manter a integridade e confiabilidade do sabre de luz.
+
+Pergunta: Como você refatoraria a função ativarSabreDeLuz para TypeScript?
+
+Selecione uma alternativa
+
+Resposta:  
+
+```JavaScript
+function ativarSabreDeLuz(cor: string) {
+    document.querySelector('#sabreDeLuz').style.backgroundColor = cor;
+}
+```
+
+> Este código é um TypeScript válido e garante que cor seja sempre uma string.
+
+### Aula 2 - O que aprendemos?
+
+Nessa aula, você aprendeu como:
+
+- Manipulação de elementos com o DOM: Como selecionar, criar e interagir com elementos HTML através de métodos como querySelector, createElement e appendChild.
+- Utilização de templates literais para estruturação de SVG: Construção e injeção de SVG diretamente no JavaScript.
+- Dinamicamente atualizar a interface baseado no estado: Iterar sobre o array estadoInicial.tarefas e criar elementos HTML correspondentes.
+- Trabalhar com classes e atributos em elementos HTML: Adicionando, verificando e definindo classes e atributos usando métodos como classList.add, setAttribute e appendChild.
+
+## Aula 3 - Gerenciando suas tarefas
+
+### Aula 3 - Projeto da aula anterior
+
+Caso queira começar daqui, você pode acessar o projeto da [aula anterior neste link](https://github.com/alura-cursos/fokus-ts/tree/aula-2). Se preferir baixar diretamente, acesse este [link para o download do arquivo zip](https://github.com/alura-cursos/fokus-ts/archive/refs/heads/aula-2.zip).
+
+### Aula 3 -  - Vídeo 1
+### Aula 3 -  - Vídeo 2
+### Aula 3 -  - Vídeo 3
+### Aula 3 -  - Vídeo 4
+### Aula 3 -  - Vídeo 5
+### Aula 3 -  - Vídeo 6
+### Aula 3 -  - Vídeo 7
