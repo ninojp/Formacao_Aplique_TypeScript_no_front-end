@@ -1296,11 +1296,12 @@ Feedback visual para tarefas concluídas: Uso de classes e atributos para altera
 
 ## Aula 4 - Refatoração e ajustes finais
 
-### Aula 4 -  - Vídeo 1
-### Aula 4 -  - Vídeo 2
-### Aula 4 -  - Vídeo 3
-### Aula 4 -  - Vídeo 4
-### Aula 4 -  - Vídeo 5
-### Aula 4 -  - Vídeo 6
-### Aula 4 -  - Vídeo 7
-### Aula 4 -  - Vídeo 8
+ULTIMA AULA
+
+### ESTE CURSO EU ME IRRITEI E ME DECEPCIONEI, E PAREI AQUI...
+
+Funções PURAs SERVE PRA QUE AFINAL??????????????????????
+USA-LAS ONDE???????????????????????????
+O professor explicou 20% do projeto e o resto 80% ficou como DESAFIO!!!!!!!!!
+
+O PROJETO FINAL BAIXADO AQUI NA AULA 4, ESTÁ ERRADO, o editar tarefas não funciona kkkkkkkkkkkkkkkk
